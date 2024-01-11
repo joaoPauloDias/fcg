@@ -8,6 +8,7 @@
 set(SOURCES
   src/main.cpp
   src/glad.c
+  src/init.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
