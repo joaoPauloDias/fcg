@@ -9,8 +9,9 @@
 
 extern std::map<std::string, SceneObject> g_VirtualScene;
 
+int numObjects = 0;
 
-ObjModel::ObjModel(const char* filename, int id, const char* basepath, bool triangulate) {
+ObjModel::ObjModel(const char* filename, const char* basepath, bool triangulate) {
     printf("Carregando objetos do arquivo \"%s\"...\n", filename);
 
     // Se basepath == NULL, então setamos basepath como o dirname do
@@ -54,7 +55,7 @@ ObjModel::ObjModel(const char* filename, int id, const char* basepath, bool tria
     }
 
     ComputeNormals();
-    BuildTrianglesAndAddToVirtualScene(id);
+    BuildTrianglesAndAddToVirtualScene();
     printf("OK.\n");
 }
 
@@ -118,7 +119,7 @@ void ObjModel::ComputeNormals() {
     }
 }
 
-void ObjModel::BuildTrianglesAndAddToVirtualScene(int id) {
+void ObjModel::BuildTrianglesAndAddToVirtualScene() {
     GLuint vertex_array_object_id;
     glGenVertexArrays(1, &vertex_array_object_id);
     glBindVertexArray(vertex_array_object_id);
@@ -202,7 +203,8 @@ void ObjModel::BuildTrianglesAndAddToVirtualScene(int id) {
 
         theobject.bbox_min = bbox_min;
         theobject.bbox_max = bbox_max;
-        theobject.id = id;
+        theobject.id = numObjects;
+        numObjects++;
 
         g_VirtualScene[shapes[shape].name] = theobject;
     }

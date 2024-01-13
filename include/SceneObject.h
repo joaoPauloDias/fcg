@@ -14,10 +14,18 @@ struct SceneObject
     GLuint       vertex_array_object_id; // ID do VAO onde estão armazenados os atributos do modelo
     glm::vec3    bbox_min; // Axis-Aligned Bounding Box do objeto
     glm::vec3    bbox_max;
+    GLuint       texture_diffuse;
+    GLuint       texture_specular;
+    GLuint       texture_normals;
+
+    bool useDiffuseTexture = false;
+    bool useSpecularTexture = false;
+    bool useNormalsTexture = false;
     
     glm::mat4x4 model_matrix;
     int id;
     
     void Draw();
     void ApplyModelMatrix(glm::mat4x4 model_matrix);
+    void setTextures(GLuint* diffuse, GLuint* specular, GLuint* normals);
 };

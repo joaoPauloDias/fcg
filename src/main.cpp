@@ -82,7 +82,7 @@ void PopMatrix(glm::mat4& M);
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
 // logo após a definição de main() neste arquivo.
 void LoadShadersFromFiles(); // Carrega os shaders de vértice e fragmento, criando um programa de GPU
-void LoadTextureImage(const char* filename); // Função que carrega imagens de textura
+GLuint LoadTextureImage(const char* filename); // Função que carrega imagens de textura
 GLuint LoadShader_Vertex(const char* filename);   // Carrega um vertex shader
 GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader
 void LoadShader(const char* filename, GLuint shader_id); // Função utilizada pelas duas acima
@@ -108,17 +108,11 @@ std::stack<glm::mat4>  g_MatrixStack;
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 float g_ScreenRatio = 1.0f;
 
-// Ângulos de Euler que controlam a rotação de um dos cubos da cena virtual
-float g_AngleX = 0.0f;
-float g_AngleY = 0.0f;
-float g_AngleZ = 0.0f;
-
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
 bool g_LeftMouseButtonPressed = false;
 bool g_RightMouseButtonPressed = false; // Análogo para botão direito do mouse
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
-
 
 //LookAtCamera camera(0.0f, 0.0f, 3.5f);
 FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 1.0f);
@@ -158,7 +152,7 @@ int main(int argc, char* argv[])
     // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
     // de pixels, e com título "INF01047 ...".
     GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "INF01047 - Seu Cartao - Seu Nome", NULL, NULL);
+    window = glfwCreateWindow(800, 600, "Tower Defense", NULL, NULL);
     if (!window)
     {
         glfwTerminate();
@@ -202,12 +196,23 @@ int main(int argc, char* argv[])
     //
     LoadShadersFromFiles();
 
-    // Carregamos duas imagens para serem utilizadas como textura
-    LoadTextureImage("assets/textures/tc-earth_daymap_surface.jpg");      // TextureImage0
-    LoadTextureImage("assets/textures/tc-earth_nightmap_citylights.gif"); // TextureImage1
-
     // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel minotaurmodel("assets/models/minotaur.obj", MINOTAUR);
+    ObjModel minotaurmodel("assets/models/minotaur.obj");
+    printf("Body ID: %d\n", g_VirtualScene["Body_mesh"].id);
+    printf("Pants ID: %d\n",  g_VirtualScene["Pants_mesh"].id);
+
+    GLuint minotaurDiffuse = LoadTextureImage("assets/textures/Minotaur_diffuse.tga");
+    GLuint minotaurSpecular = LoadTextureImage("assets/textures/Minotaur_specular.tga");
+    GLuint minotaurNormals = LoadTextureImage("assets/textures/Minotaur_normals.tga");
+
+    GLuint pantsDiffuse = LoadTextureImage("assets/textures/Pants_diffuse.tga");
+    GLuint pantsSpecular = LoadTextureImage("assets/textures/Pants_specular.tga");
+    GLuint pantsNormals = LoadTextureImage("assets/textures/Pants_normals.tga");
+
+    g_VirtualScene["Body_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
+    g_VirtualScene["Eyes_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
+    g_VirtualScene["Teeth_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
+    g_VirtualScene["Pants_mesh"].setTextures(&pantsDiffuse, &pantsSpecular, &pantsNormals);
 
     // Inicializamos o código para renderização de texto.
     TextRendering_Init();
@@ -277,7 +282,7 @@ int main(int argc, char* argv[])
 }
 
 // Função que carrega uma imagem para ser utilizada como textura
-void LoadTextureImage(const char* filename)
+GLuint LoadTextureImage(const char* filename)
 {
     printf("Carregando imagem \"%s\"... ", filename);
 
@@ -326,6 +331,7 @@ void LoadTextureImage(const char* filename)
     stbi_image_free(data);
 
     g_NumLoadedTextures += 1;
+    return textureunit;
 }
 
 // Função que carrega os shaders de vértices e de fragmentos que serão
@@ -356,9 +362,6 @@ void LoadShadersFromFiles()
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage0"), 0);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage1"), 1);
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureImage2"), 2);
     glUseProgram(0);
 }
 
@@ -666,29 +669,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
         glfwSetWindowShouldClose(window, GL_TRUE);
 
     camera.handleKey(key, scancode, action, mod);
-    // O código abaixo implementa a seguinte lógica:
-    //   Se apertar tecla X       então g_AngleX += delta;
-    //   Se apertar tecla shift+X então g_AngleX -= delta;
-    //   Se apertar tecla Y       então g_AngleY += delta;
-    //   Se apertar tecla shift+Y então g_AngleY -= delta;
-    //   Se apertar tecla Z       então g_AngleZ += delta;
-    //   Se apertar tecla shift+Z então g_AngleZ -= delta;
-
-    float delta = 3.141592 / 16; // 22.5 graus, em radianos.
-
-    if (key == GLFW_KEY_X && action == GLFW_PRESS)
-    {
-        g_AngleX += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
-
-    if (key == GLFW_KEY_Y && action == GLFW_PRESS)
-    {
-        g_AngleY += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
-    if (key == GLFW_KEY_Z && action == GLFW_PRESS)
-    {
-        g_AngleZ += (mod & GLFW_MOD_SHIFT) ? -delta : delta;
-    }
 
     // Se o usuário apertar a tecla H, fazemos um "toggle" do texto informativo mostrado na tela.
     if (key == GLFW_KEY_H && action == GLFW_PRESS)

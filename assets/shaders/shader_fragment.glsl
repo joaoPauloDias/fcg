@@ -19,9 +19,7 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Identificador que define qual objeto está sendo desenhado no momento
-#define SPHERE 0
-#define BUNNY  1
-#define PLANE  2
+#define MINOTAUR 0
 uniform int object_id;
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -29,9 +27,13 @@ uniform vec4 bbox_min;
 uniform vec4 bbox_max;
 
 // Variáveis para acesso das imagens de textura
-uniform sampler2D TextureImage0;
-uniform sampler2D TextureImage1;
-uniform sampler2D TextureImage2;
+uniform sampler2D TextureDiffuse;
+uniform sampler2D TextureSpecular;
+uniform sampler2D TextureNormals;
+
+uniform bool useDiffuseTexture;
+uniform bool useSpecularTexture;
+uniform bool useNormalsTexture;
 
 // O valor de saída ("out") de um Fragment Shader é a cor final do fragmento.
 out vec4 color;
@@ -54,9 +56,23 @@ void main()
     // vértice.
     vec4 p = position_world;
 
+    // Coordenadas de textura U e V
+    float U = 0.0;
+    float V = 0.0;
+
+    // Coordenadas de textura do plano, obtidas do arquivo OBJ.
+    U = texcoords.x;
+    V = texcoords.y;
+
+    vec4 n;
+    if (useNormalsTexture) {
+        n = normalize(texture(TextureNormals, vec2(U,V)).rgba);
+    } else {
+        n = normalize(normal);
+    }
+    
     // Normal do fragmento atual, interpolada pelo rasterizador a partir das
     // normais de cada vértice.
-    vec4 n = normalize(normal);
 
     // Vetor que define o sentido da fonte de luz em relação ao ponto atual.
     vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
@@ -64,67 +80,28 @@ void main()
     // Vetor que define o sentido da câmera em relação ao ponto atual.
     vec4 v = normalize(camera_position - p);
 
-    // Coordenadas de textura U e V
-    float U = 0.0;
-    float V = 0.0;
-
-    if ( object_id == SPHERE )
-    {
-        // PREENCHA AQUI as coordenadas de textura da esfera, computadas com
-        // projeção esférica EM COORDENADAS DO MODELO. Utilize como referência
-        // o slides 134-150 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // A esfera que define a projeção deve estar centrada na posição
-        // "bbox_center" definida abaixo.
-
-        // Você deve utilizar:
-        //   função 'length( )' : comprimento Euclidiano de um vetor
-        //   função 'atan( , )' : arcotangente. Veja https://en.wikipedia.org/wiki/Atan2.
-        //   função 'asin( )'   : seno inverso.
-        //   constante M_PI
-        //   variável position_model
-
-        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
-
-        U = 0.0;
-        V = 0.0;
-    }
-    else if ( object_id == BUNNY )
-    {
-        // PREENCHA AQUI as coordenadas de textura do coelho, computadas com
-        // projeção planar XY em COORDENADAS DO MODELO. Utilize como referência
-        // o slides 99-104 do documento Aula_20_Mapeamento_de_Texturas.pdf,
-        // e também use as variáveis min*/max* definidas abaixo para normalizar
-        // as coordenadas de textura U e V dentro do intervalo [0,1]. Para
-        // tanto, veja por exemplo o mapeamento da variável 'p_v' utilizando
-        // 'h' no slides 158-160 do documento Aula_20_Mapeamento_de_Texturas.pdf.
-        // Veja também a Questão 4 do Questionário 4 no Moodle.
-
-        float minx = bbox_min.x;
-        float maxx = bbox_max.x;
-
-        float miny = bbox_min.y;
-        float maxy = bbox_max.y;
-
-        float minz = bbox_min.z;
-        float maxz = bbox_max.z;
-
-        U = 0.0;
-        V = 0.0;
-    }
-    else if ( object_id == PLANE )
-    {
-        // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-        U = texcoords.x;
-        V = texcoords.y;
-    }
+    // Vetor que define o sentido da reflexão especular ideal.
+    vec4 r = -l + 2 * n * dot(n, l);
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
-    vec3 Kd0 = texture(TextureImage0, vec2(U,V)).rgb;
-
+    vec3 Kd;
+    if (useDiffuseTexture) {
+        Kd = texture(TextureDiffuse, vec2(U,V)).rgb;
+    } else {
+        Kd = vec3(1.0, 1.0, 1.0);
+    }
+    vec3 Ks;
+    if (useSpecularTexture) {
+        Ks = texture(TextureSpecular, vec2(U,V)).rgb;
+    } else {
+        Ks = vec3(0, 0, 0);
+    }
+    
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
+    float q = 40;
 
-    color.rgb = Kd0 * (lambert + 0.01);
+    color.rgb = Kd * lambert + Ks * pow(max(0, dot(r, v)), 40) + Kd * 0.3 * lambert;
 
     // NOTE: Se você quiser fazer o rendering de objetos transparentes, é
     // necessário:
