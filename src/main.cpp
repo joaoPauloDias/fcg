@@ -29,6 +29,7 @@
 #include <sstream>
 #include <stdexcept>
 #include <algorithm>
+#include <functional>
 
 // Headers das bibliotecas OpenGL
 #include <glad/glad.h>   // Criação de contexto OpenGL 3.3
@@ -52,7 +53,7 @@
 #include "SceneObject.h"
 #include "ObjModel.h"
 #include "Camera.h"
-
+#include "Engine.h"
 
 #define MINOTAUR 0
 
@@ -125,6 +126,8 @@ GLuint g_NumLoadedTextures = 0;
 
 int main(int argc, char* argv[])
 {
+    engine::Engine TheEngine;
+
     // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
     // sistema operacional, onde poderemos renderizar com OpenGL.
     int success = glfwInit();
@@ -162,13 +165,14 @@ int main(int argc, char* argv[])
 
     // Definimos a função de callback que será chamada sempre que o usuário
     // pressionar alguma tecla do teclado ...
-    glfwSetKeyCallback(window, KeyCallback);
+    auto keyCallback = std::bind(&engine::Engine::KeyCallback, TheEngine);
+    glfwSetKeyCallback(window, TheEngine.KeyCallback);
     // ... ou clicar os botões do mouse ...
-    glfwSetMouseButtonCallback(window, MouseButtonCallback);
+    //glfwSetMouseButtonCallback(window, TheEngine.MouseButtonCallback);
     // ... ou movimentar o cursor do mouse em cima da janela ...
-    glfwSetCursorPosCallback(window, CursorPosCallback);
+    //glfwSetCursorPosCallback(window, TheEngine.CursorPosCallback);
     // ... ou rolar a "rodinha" do mouse.
-    glfwSetScrollCallback(window, ScrollCallback);
+    //glfwSetScrollCallback(window, TheEngine.ScrollCallback);
 
     // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
     glfwMakeContextCurrent(window);

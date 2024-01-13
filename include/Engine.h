@@ -27,10 +27,8 @@ namespace engine
         void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
         void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
         void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
+        void ErrorCallback(int error, const char* description);
         void Run();
-
-
-
     };
 } // namespace engine
 

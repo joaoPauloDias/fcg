@@ -1,3 +1,4 @@
+#pragma once
 #include <glm/vec4.hpp>
 
 struct LookAtCamera {
