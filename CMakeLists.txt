@@ -7,8 +7,14 @@
 # ser compilados.
 set(SOURCES
   src/main.cpp
+  src/textrendering.cpp
+  src/tiny_obj_loader.cpp
+  src/stb_image.cpp
   src/glad.c
-  src/init.cpp
+  src/SceneObject.cpp
+  src/ObjModel.cpp
+  src/matrices.cpp
+  src/Camera.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
