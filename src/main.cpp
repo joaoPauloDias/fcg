@@ -197,17 +197,17 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
-    ObjModel minotaurmodel("assets/models/minotaur.obj");
+    ObjModel minotaurmodel("../../assets/models/minotaur.obj");
     printf("Body ID: %d\n", g_VirtualScene["Body_mesh"].id);
     printf("Pants ID: %d\n",  g_VirtualScene["Pants_mesh"].id);
 
-    GLuint minotaurDiffuse = LoadTextureImage("assets/textures/Minotaur_diffuse.tga");
-    GLuint minotaurSpecular = LoadTextureImage("assets/textures/Minotaur_specular.tga");
-    GLuint minotaurNormals = LoadTextureImage("assets/textures/Minotaur_normals.tga");
+    GLuint minotaurDiffuse = LoadTextureImage("../../assets/textures/Minotaur_diffuse.tga");
+    GLuint minotaurSpecular = LoadTextureImage("../../assets/textures/Minotaur_specular.tga");
+    GLuint minotaurNormals = LoadTextureImage("../../assets/textures/Minotaur_normals.tga");
 
-    GLuint pantsDiffuse = LoadTextureImage("assets/textures/Pants_diffuse.tga");
-    GLuint pantsSpecular = LoadTextureImage("assets/textures/Pants_specular.tga");
-    GLuint pantsNormals = LoadTextureImage("assets/textures/Pants_normals.tga");
+    GLuint pantsDiffuse = LoadTextureImage("../../assets/textures/Pants_diffuse.tga");
+    GLuint pantsSpecular = LoadTextureImage("../../assets/textures/Pants_specular.tga");
+    GLuint pantsNormals = LoadTextureImage("../../assets/textures/Pants_normals.tga");
 
     g_VirtualScene["Body_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
     g_VirtualScene["Eyes_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
@@ -340,8 +340,8 @@ GLuint LoadTextureImage(const char* filename)
 void LoadShadersFromFiles()
 {
 
-    GLuint vertex_shader_id = LoadShader_Vertex("assets/shaders/shader_vertex.glsl");
-    GLuint fragment_shader_id = LoadShader_Fragment("assets/shaders/shader_fragment.glsl");
+    GLuint vertex_shader_id = LoadShader_Vertex("../../assets/shaders/shader_vertex.glsl");
+    GLuint fragment_shader_id = LoadShader_Fragment("../../assets/shaders/shader_fragment.glsl");
 
     // Deletamos o programa de GPU anterior, caso ele exista.
     if ( g_GpuProgramID != 0 )
