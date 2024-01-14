@@ -15,6 +15,7 @@ set(SOURCES
   src/ObjModel.cpp
   src/matrices.cpp
   src/Camera.cpp
+  src/Engine.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
