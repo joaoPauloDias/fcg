@@ -20,6 +20,8 @@ extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed; // Análogo para botão direito do mouse
 extern bool g_MiddleMouseButtonPressed;
 extern bool g_ShowInfoText;
+extern double g_LastCursorPosX;
+extern double g_LastCursorPosY;
 
 namespace engine{
     GLFWwindow* Init() {
@@ -117,10 +119,6 @@ namespace engine{
         g_ScreenRatio = (float)width / height;
     }
 
-    // Variáveis globais que armazenam a última posição do cursor do mouse, para
-    // que possamos calcular quanto que o mouse se movimentou entre dois instantes
-    // de tempo. Utilizadas no callback CursorPosCallback() abaixo.
-    double g_LastCursorPosX, g_LastCursorPosY;
 
     // Função callback chamada sempre que o usuário aperta algum dos botões do mouse
     void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
