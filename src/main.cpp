@@ -126,74 +126,7 @@ GLuint g_NumLoadedTextures = 0;
 
 int main(int argc, char* argv[])
 {
-    engine::Engine TheEngine;
-
-    // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
-    // sistema operacional, onde poderemos renderizar com OpenGL.
-    int success = glfwInit();
-    if (!success)
-    {
-        fprintf(stderr, "ERROR: glfwInit() failed.\n");
-        std::exit(EXIT_FAILURE);
-    }
-
-    // Definimos o callback para impressão de erros da GLFW no terminal
-    glfwSetErrorCallback(ErrorCallback);
-
-    // Pedimos para utilizar OpenGL versão 3.3 (ou superior)
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-
-    #ifdef __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-    #endif
-
-    // Pedimos para utilizar o perfil "core", isto é, utilizaremos somente as
-    // funções modernas de OpenGL.
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
-    // de pixels, e com título "INF01047 ...".
-    GLFWwindow* window;
-    window = glfwCreateWindow(800, 600, "Tower Defense", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        fprintf(stderr, "ERROR: glfwCreateWindow() failed.\n");
-        std::exit(EXIT_FAILURE);
-    }
-
-    // Definimos a função de callback que será chamada sempre que o usuário
-    // pressionar alguma tecla do teclado ...
-    auto keyCallback = std::bind(&engine::Engine::KeyCallback, TheEngine);
-    glfwSetKeyCallback(window, TheEngine.KeyCallback);
-    // ... ou clicar os botões do mouse ...
-    //glfwSetMouseButtonCallback(window, TheEngine.MouseButtonCallback);
-    // ... ou movimentar o cursor do mouse em cima da janela ...
-    //glfwSetCursorPosCallback(window, TheEngine.CursorPosCallback);
-    // ... ou rolar a "rodinha" do mouse.
-    //glfwSetScrollCallback(window, TheEngine.ScrollCallback);
-
-    // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
-    glfwMakeContextCurrent(window);
-
-    // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
-    // biblioteca GLAD.
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
-    // Definimos a função de callback que será chamada sempre que a janela for
-    // redimensionada, por consequência alterando o tamanho do "framebuffer"
-    // (região de memória onde são armazenados os pixels da imagem).
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
-    FramebufferSizeCallback(window, 800, 600); // Forçamos a chamada do callback acima, para definir g_ScreenRatio.
-
-    // Imprimimos no terminal informações sobre a GPU do sistema
-    const GLubyte *vendor      = glGetString(GL_VENDOR);
-    const GLubyte *renderer    = glGetString(GL_RENDERER);
-    const GLubyte *glversion   = glGetString(GL_VERSION);
-    const GLubyte *glslversion = glGetString(GL_SHADING_LANGUAGE_VERSION);
-
-    printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
+    GLFWwindow *window = engine::Init();
 
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
@@ -218,68 +151,7 @@ int main(int argc, char* argv[])
     g_VirtualScene["Teeth_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
     g_VirtualScene["Pants_mesh"].setTextures(&pantsDiffuse, &pantsSpecular, &pantsNormals);
 
-    // Inicializamos o código para renderização de texto.
-    TextRendering_Init();
-
-    // Habilitamos o Z-buffer. Veja slides 104-116 do documento Aula_09_Projecoes.pdf.
-    glEnable(GL_DEPTH_TEST);
-
-    // Habilitamos o Backface Culling. Veja slides 23-34 do documento Aula_13_Clipping_and_Culling.pdf e slides 112-123 do documento Aula_14_Laboratorio_3_Revisao.pdf.
-    //glEnable(GL_CULL_FACE);
-    //glCullFace(GL_BACK);
-    //glFrontFace(GL_CCW);
-
-    double prev_time = glfwGetTime();
-    
-    // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
-    while (!glfwWindowShouldClose(window))
-    {
-        double cur_time = glfwGetTime();
-        double dt = cur_time - prev_time;
-        prev_time = cur_time;
-        // Aqui executamos as operações de renderização
-
-        // Definimos a cor do "fundo" do framebuffer como branco.  Tal cor é
-        // definida como coeficientes RGBA: Red, Green, Blue, Alpha; isto é:
-        // Vermelho, Verde, Azul, Alpha (valor de transparência).
-        // Conversaremos sobre sistemas de cores nas aulas de Modelos de Iluminação.
-        //
-        //           R     G     B     A
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-        // "Pintamos" todos os pixels do framebuffer com a cor definida acima,
-        // e também resetamos todos os pixels do Z-buffer (depth buffer).
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
-        // os shaders de vértice e fragmentos).
-        glUseProgram(g_GpuProgramID);
-
-        camera.update(dt);
-
-        glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
-
-        model = Matrix_Translate(0.0f,-1.0f,0.0f) * Matrix_Scale(0.02f, 0.02f, 0.02f);
-        g_VirtualScene["Eyes_mesh"].ApplyModelMatrix(model);
-        g_VirtualScene["Eyes_mesh"].Draw();
-
-        g_VirtualScene["Body_mesh"].ApplyModelMatrix(model);
-        g_VirtualScene["Body_mesh"].Draw();
-
-        g_VirtualScene["Teeth_mesh"].ApplyModelMatrix(model);
-        g_VirtualScene["Teeth_mesh"].Draw();
-
-        g_VirtualScene["Pants_mesh"].ApplyModelMatrix(model);
-        g_VirtualScene["Pants_mesh"].Draw();
-        
-        TextRendering_ShowFramesPerSecond(window);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    // Finalizamos o uso dos recursos do sistema operacional
-    glfwTerminate();
+    engine::Run(window);
 
     // Fim do programa
     return 0;
