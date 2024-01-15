@@ -32,14 +32,14 @@
 #include <functional>
 
 // Headers das bibliotecas OpenGL
-#include <glad/glad.h>   // Criação de contexto OpenGL 3.3
-#include <GLFW/glfw3.h>  // Criação de janelas do sistema operacional
+#include <glad/glad.h>  // Criação de contexto OpenGL 3.3
+#include <GLFW/glfw3.h> // Criação de janelas do sistema operacional
 
 // Headers da biblioteca GLM: criação de matrizes e vetores.
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <toml.hpp>
+#include <tomlplusplus/toml.hpp>
 
 // Headers da biblioteca para carregar modelos obj
 #include <tiny_obj_loader.h>
@@ -67,7 +67,6 @@ GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
 
-
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
 // A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
@@ -76,35 +75,33 @@ GLint g_bbox_max_uniform;
 // estes são acessados.
 std::map<std::string, SceneObject> g_VirtualScene;
 
-
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
-void PopMatrix(glm::mat4& M);
+void PopMatrix(glm::mat4 &M);
 
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
 // logo após a definição de main() neste arquivo.
-void LoadShadersFromFiles(); // Carrega os shaders de vértice e fragmento, criando um programa de GPU
-GLuint LoadShader_Vertex(const char* filename);   // Carrega um vertex shader
-GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader
-void LoadShader(const char* filename, GLuint shader_id); // Função utilizada pelas duas acima
+void LoadShadersFromFiles();                                                 // Carrega os shaders de vértice e fragmento, criando um programa de GPU
+GLuint LoadShader_Vertex(const char *filename);                              // Carrega um vertex shader
+GLuint LoadShader_Fragment(const char *filename);                            // Carrega um fragment shader
+void LoadShader(const char *filename, GLuint shader_id);                     // Função utilizada pelas duas acima
 GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id); // Cria um programa de GPU
 
 // Funções abaixo renderizam como texto na janela OpenGL algumas matrizes e
 // outras informações do programa. Definidas após main().
-void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
+void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
 
 // Funções callback para comunicação com o sistema operacional e interação do
 // usuário. Veja mais comentários nas definições das mesmas, abaixo.
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
-void ErrorCallback(int error, const char* description);
-void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
-void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
-void CursorPosCallback(GLFWwindow* window, double xpos, double ypos);
-void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset);
-
+void FramebufferSizeCallback(GLFWwindow *window, int width, int height);
+void ErrorCallback(int error, const char *description);
+void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode);
+void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods);
+void CursorPosCallback(GLFWwindow *window, double xpos, double ypos);
+void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset);
 
 // Pilha que guardará as matrizes de modelagem.
-std::stack<glm::mat4>  g_MatrixStack;
+std::stack<glm::mat4> g_MatrixStack;
 
 // Razão de proporção da janela (largura/altura). Veja função FramebufferSizeCallback().
 float g_ScreenRatio = 1.0f;
@@ -112,19 +109,17 @@ float g_ScreenRatio = 1.0f;
 // "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
 // pressionado no momento atual. Veja função MouseButtonCallback().
 bool g_LeftMouseButtonPressed = false;
-bool g_RightMouseButtonPressed = false; // Análogo para botão direito do mouse
+bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mouse
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
-//LookAtCamera camera(0.0f, 0.0f, 3.5f);
+// LookAtCamera camera(0.0f, 0.0f, 3.5f);
 FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 1.0f);
 
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
 
-std::string settings = "../../assets/settings.toml";
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
     GLFWwindow *window = engine::Init();
 
@@ -134,19 +129,23 @@ int main(int argc, char* argv[])
     LoadShadersFromFiles();
     texture::TextureLoader textureLoader;
 
-    auto config = toml::parse(settings);
-    auto asset = config->get_table
+    // Load and parse the TOML configuration
+    auto config = toml::parse_file("../../assets/settings.toml");
 
-    // Construímos a representação de objetos geométricos através de malhas de triângulos
+    // Load Textures
+    if(auto tbl = config["textures"].as_table()){
+        for(auto& elem: *tbl){
+            for(auto& tex: *elem.second.as_table()){
+                std::string texture_name = elem.first + "_" + tex.first;
+                std::string texture_path = tex.second.value<std::string>().value_or("");
+                textureLoader.LoadTexture(texture_name, texture_path.c_str());
+            }
+        }
+    }
+
     ObjModel minotaurmodel("../../assets/models/minotaur.obj");
-    printf("Body ID: %d\n", g_VirtualScene["Body_mesh"].id);
-    printf("Pants ID: %d\n",  g_VirtualScene["Pants_mesh"].id);
-    textureLoader.LoadTexture("minotaur_diffuse", "../../assets/textures/Minotaur_diffuse.tga");
-    textureLoader.LoadTexture("minotaur_specular", "../../assets/textures/Minotaur_specular.tga");
-    textureLoader.LoadTexture("minotaur_normals", "../../assets/textures/Minotaur_normals.tga");
-    textureLoader.LoadTexture("pants_diffuse", "../../assets/textures/Pants_diffuse.tga");
-    textureLoader.LoadTexture("pants_specular", "../../assets/textures/Pants_specular.tga");
-    textureLoader.LoadTexture("pants_normals", "../../assets/textures/Pants_normals.tga");
+
+
     g_VirtualScene["Body_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     g_VirtualScene["Eyes_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     g_VirtualScene["Teeth_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
@@ -167,7 +166,7 @@ void LoadShadersFromFiles()
     GLuint fragment_shader_id = LoadShader_Fragment("../../assets/shaders/shader_fragment.glsl");
 
     // Deletamos o programa de GPU anterior, caso ele exista.
-    if ( g_GpuProgramID != 0 )
+    if (g_GpuProgramID != 0)
         glDeleteProgram(g_GpuProgramID);
 
     // Criamos um programa de GPU utilizando os shaders carregados acima.
@@ -176,12 +175,12 @@ void LoadShadersFromFiles()
     // Buscamos o endereço das variáveis definidas dentro do Vertex Shader.
     // Utilizaremos estas variáveis para enviar dados para a placa de vídeo
     // (GPU)! Veja arquivo "shader_vertex.glsl" e "shader_fragment.glsl".
-    g_model_uniform      = glGetUniformLocation(g_GpuProgramID, "model"); // Variável da matriz "model"
-    g_view_uniform       = glGetUniformLocation(g_GpuProgramID, "view"); // Variável da matriz "view" em shader_vertex.glsl
+    g_model_uniform = glGetUniformLocation(g_GpuProgramID, "model");           // Variável da matriz "model"
+    g_view_uniform = glGetUniformLocation(g_GpuProgramID, "view");             // Variável da matriz "view" em shader_vertex.glsl
     g_projection_uniform = glGetUniformLocation(g_GpuProgramID, "projection"); // Variável da matriz "projection" em shader_vertex.glsl
-    g_object_id_uniform  = glGetUniformLocation(g_GpuProgramID, "object_id"); // Variável "object_id" em shader_fragment.glsl
-    g_bbox_min_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_min");
-    g_bbox_max_uniform   = glGetUniformLocation(g_GpuProgramID, "bbox_max");
+    g_object_id_uniform = glGetUniformLocation(g_GpuProgramID, "object_id");   // Variável "object_id" em shader_fragment.glsl
+    g_bbox_min_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_min");
+    g_bbox_max_uniform = glGetUniformLocation(g_GpuProgramID, "bbox_max");
 
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
@@ -195,9 +194,9 @@ void PushMatrix(glm::mat4 M)
 }
 
 // Função que remove a matriz atualmente no topo da pilha e armazena a mesma na variável M
-void PopMatrix(glm::mat4& M)
+void PopMatrix(glm::mat4 &M)
 {
-    if ( g_MatrixStack.empty() )
+    if (g_MatrixStack.empty())
     {
         M = Matrix_Identity();
     }
@@ -209,7 +208,7 @@ void PopMatrix(glm::mat4& M)
 }
 
 // Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Vertex(const char* filename)
+GLuint LoadShader_Vertex(const char *filename)
 {
     // Criamos um identificador (ID) para este shader, informando que o mesmo
     // será aplicado nos vértices.
@@ -223,7 +222,7 @@ GLuint LoadShader_Vertex(const char* filename)
 }
 
 // Carrega um Fragment Shader de um arquivo GLSL . Veja definição de LoadShader() abaixo.
-GLuint LoadShader_Fragment(const char* filename)
+GLuint LoadShader_Fragment(const char *filename)
 {
     // Criamos um identificador (ID) para este shader, informando que o mesmo
     // será aplicado nos fragmentos.
@@ -238,24 +237,27 @@ GLuint LoadShader_Fragment(const char* filename)
 
 // Função auxilar, utilizada pelas duas funções acima. Carrega código de GPU de
 // um arquivo GLSL e faz sua compilação.
-void LoadShader(const char* filename, GLuint shader_id)
+void LoadShader(const char *filename, GLuint shader_id)
 {
     // Lemos o arquivo de texto indicado pela variável "filename"
     // e colocamos seu conteúdo em memória, apontado pela variável
     // "shader_string".
     std::ifstream file;
-    try {
+    try
+    {
         file.exceptions(std::ifstream::failbit);
         file.open(filename);
-    } catch ( std::exception& e ) {
+    }
+    catch (std::exception &e)
+    {
         fprintf(stderr, "ERROR: Cannot open file \"%s\".\n", filename);
         std::exit(EXIT_FAILURE);
     }
     std::stringstream shader;
     shader << file.rdbuf();
     std::string str = shader.str();
-    const GLchar* shader_string = str.c_str();
-    const GLint   shader_string_length = static_cast<GLint>( str.length() );
+    const GLchar *shader_string = str.c_str();
+    const GLint shader_string_length = static_cast<GLint>(str.length());
 
     // Define o código do shader GLSL, contido na string "shader_string"
     glShaderSource(shader_id, 1, &shader_string, &shader_string_length);
@@ -272,15 +274,15 @@ void LoadShader(const char* filename, GLuint shader_id)
 
     // Alocamos memória para guardar o log de compilação.
     // A chamada "new" em C++ é equivalente ao "malloc()" do C.
-    GLchar* log = new GLchar[log_length];
+    GLchar *log = new GLchar[log_length];
     glGetShaderInfoLog(shader_id, log_length, &log_length, log);
 
     // Imprime no terminal qualquer erro ou "warning" de compilação
-    if ( log_length != 0 )
+    if (log_length != 0)
     {
-        std::string  output;
+        std::string output;
 
-        if ( !compiled_ok )
+        if (!compiled_ok)
         {
             output += "ERROR: OpenGL compilation of \"";
             output += filename;
@@ -303,7 +305,7 @@ void LoadShader(const char* filename, GLuint shader_id)
     }
 
     // A chamada "delete" em C++ é equivalente ao "free()" do C
-    delete [] log;
+    delete[] log;
 }
 
 // Esta função cria um programa de GPU, o qual contém obrigatoriamente um
@@ -325,14 +327,14 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
     glGetProgramiv(program_id, GL_LINK_STATUS, &linked_ok);
 
     // Imprime no terminal qualquer erro de linkagem
-    if ( linked_ok == GL_FALSE )
+    if (linked_ok == GL_FALSE)
     {
         GLint log_length = 0;
         glGetProgramiv(program_id, GL_INFO_LOG_LENGTH, &log_length);
 
         // Alocamos memória para guardar o log de compilação.
         // A chamada "new" em C++ é equivalente ao "malloc()" do C.
-        GLchar* log = new GLchar[log_length];
+        GLchar *log = new GLchar[log_length];
 
         glGetProgramInfoLog(program_id, log_length, &log_length, log);
 
@@ -344,12 +346,12 @@ GLuint CreateGpuProgram(GLuint vertex_shader_id, GLuint fragment_shader_id)
         output += "\n== End of link log\n";
 
         // A chamada "delete" em C++ é equivalente ao "free()" do C
-        delete [] log;
+        delete[] log;
 
         fprintf(stderr, "%s", output.c_str());
     }
 
-    // Os "Shader Objects" podem ser marcados para deleção após serem linkados 
+    // Os "Shader Objects" podem ser marcados para deleção após serem linkados
     glDeleteShader(vertex_shader_id);
     glDeleteShader(fragment_shader_id);
 
@@ -364,17 +366,17 @@ double g_LastCursorPosX, g_LastCursorPosY;
 
 // Escrevemos na tela o número de quadros renderizados por segundo (frames per
 // second).
-void TextRendering_ShowFramesPerSecond(GLFWwindow* window)
+void TextRendering_ShowFramesPerSecond(GLFWwindow *window)
 {
-    if ( !g_ShowInfoText )
+    if (!g_ShowInfoText)
         return;
 
     // Variáveis estáticas (static) mantém seus valores entre chamadas
     // subsequentes da função!
     static float old_seconds = (float)glfwGetTime();
-    static int   ellapsed_frames = 0;
-    static char  buffer[20] = "?? fps";
-    static int   numchars = 7;
+    static int ellapsed_frames = 0;
+    static char buffer[20] = "?? fps";
+    static int numchars = 7;
 
     ellapsed_frames += 1;
 
@@ -384,10 +386,10 @@ void TextRendering_ShowFramesPerSecond(GLFWwindow* window)
     // Número de segundos desde o último cálculo do fps
     float ellapsed_seconds = seconds - old_seconds;
 
-    if ( ellapsed_seconds > 1.0f )
+    if (ellapsed_seconds > 1.0f)
     {
         numchars = snprintf(buffer, 20, "%.2f fps", ellapsed_frames / ellapsed_seconds);
-    
+
         old_seconds = seconds;
         ellapsed_frames = 0;
     }
@@ -395,11 +397,8 @@ void TextRendering_ShowFramesPerSecond(GLFWwindow* window)
     float lineheight = TextRendering_LineHeight(window);
     float charwidth = TextRendering_CharWidth(window);
 
-    TextRendering_PrintString(window, buffer, 1.0f-(numchars + 1)*charwidth, 1.0f-lineheight, 1.0f);
+    TextRendering_PrintString(window, buffer, 1.0f - (numchars + 1) * charwidth, 1.0f - lineheight, 1.0f);
 }
-
-
 
 // set makeprg=cd\ ..\ &&\ make\ run\ >/dev/null
 // vim: set spell spelllang=pt_br :
-
