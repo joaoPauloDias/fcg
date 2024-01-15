@@ -1,0 +1,22 @@
+[assets]
+models = "path/to/models"
+textures = "path/to/textures"
+shaders = "path/to/shaders"
+
+[models]
+minotaur = "minotaur.obj"
+maze = "maze.obj"
+sphere = "sphere.obj"
+
+[textures]
+    [textures.minotaur]
+        minotaur_diffuse = "Minotaur_diffuse.tga"
+        minotaur_normals = "Minotaur_normals.tga"
+        minotaur_specular = "Minotaur_specular.tga"
+        pants_diffuse = "Pants_diffuse.tga"
+        pants_normals = "Pants_normals.tga"
+        pants_specular = "Pants_specular.tga"
+
+[shaders]
+vertex_shader = "shader_vertex.glsl"
+fragment_shader = "shader_fragment.glsl"

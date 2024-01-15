@@ -39,6 +39,7 @@
 #include <glm/mat4x4.hpp>
 #include <glm/vec4.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <toml.hpp>
 
 // Headers da biblioteca para carregar modelos obj
 #include <tiny_obj_loader.h>
@@ -54,7 +55,7 @@
 #include "ObjModel.h"
 #include "Camera.h"
 #include "Engine.h"
-
+#include "TextureLoader.h"
 #define MINOTAUR 0
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -83,7 +84,6 @@ void PopMatrix(glm::mat4& M);
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
 // logo após a definição de main() neste arquivo.
 void LoadShadersFromFiles(); // Carrega os shaders de vértice e fragmento, criando um programa de GPU
-GLuint LoadTextureImage(const char* filename); // Função que carrega imagens de textura
 GLuint LoadShader_Vertex(const char* filename);   // Carrega um vertex shader
 GLuint LoadShader_Fragment(const char* filename); // Carrega um fragment shader
 void LoadShader(const char* filename, GLuint shader_id); // Função utilizada pelas duas acima
@@ -121,8 +121,8 @@ FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 1.0f);
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
 
-// Número de texturas carregadas pela função LoadTextureImage()
-GLuint g_NumLoadedTextures = 0;
+std::string settings = "../../assets/settings.toml";
+
 
 int main(int argc, char* argv[])
 {
@@ -132,84 +132,31 @@ int main(int argc, char* argv[])
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
     //
     LoadShadersFromFiles();
+    texture::TextureLoader textureLoader;
+
+    auto config = toml::parse(settings);
+    auto asset = config->get_table
 
     // Construímos a representação de objetos geométricos através de malhas de triângulos
     ObjModel minotaurmodel("../../assets/models/minotaur.obj");
     printf("Body ID: %d\n", g_VirtualScene["Body_mesh"].id);
     printf("Pants ID: %d\n",  g_VirtualScene["Pants_mesh"].id);
-
-    GLuint minotaurDiffuse = LoadTextureImage("../../assets/textures/Minotaur_diffuse.tga");
-    GLuint minotaurSpecular = LoadTextureImage("../../assets/textures/Minotaur_specular.tga");
-    GLuint minotaurNormals = LoadTextureImage("../../assets/textures/Minotaur_normals.tga");
-
-    GLuint pantsDiffuse = LoadTextureImage("../../assets/textures/Pants_diffuse.tga");
-    GLuint pantsSpecular = LoadTextureImage("../../assets/textures/Pants_specular.tga");
-    GLuint pantsNormals = LoadTextureImage("../../assets/textures/Pants_normals.tga");
-
-    g_VirtualScene["Body_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
-    g_VirtualScene["Eyes_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
-    g_VirtualScene["Teeth_mesh"].setTextures(&minotaurDiffuse, &minotaurSpecular, &minotaurNormals);
-    g_VirtualScene["Pants_mesh"].setTextures(&pantsDiffuse, &pantsSpecular, &pantsNormals);
+    textureLoader.LoadTexture("minotaur_diffuse", "../../assets/textures/Minotaur_diffuse.tga");
+    textureLoader.LoadTexture("minotaur_specular", "../../assets/textures/Minotaur_specular.tga");
+    textureLoader.LoadTexture("minotaur_normals", "../../assets/textures/Minotaur_normals.tga");
+    textureLoader.LoadTexture("pants_diffuse", "../../assets/textures/Pants_diffuse.tga");
+    textureLoader.LoadTexture("pants_specular", "../../assets/textures/Pants_specular.tga");
+    textureLoader.LoadTexture("pants_normals", "../../assets/textures/Pants_normals.tga");
+    g_VirtualScene["Body_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
+    g_VirtualScene["Eyes_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
+    g_VirtualScene["Teeth_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
+    g_VirtualScene["Pants_mesh"].setTextures(textureLoader.GetTexture("pants_diffuse"), textureLoader.GetTexture("pants_specular"), textureLoader.GetTexture("pants_normals"));
 
     engine::Run(window);
 
     // Fim do programa
     return 0;
 }
-
-// Função que carrega uma imagem para ser utilizada como textura
-GLuint LoadTextureImage(const char* filename)
-{
-    printf("Carregando imagem \"%s\"... ", filename);
-
-    // Primeiro fazemos a leitura da imagem do disco
-    stbi_set_flip_vertically_on_load(true);
-    int width;
-    int height;
-    int channels;
-    unsigned char *data = stbi_load(filename, &width, &height, &channels, 3);
-
-    if ( data == NULL )
-    {
-        fprintf(stderr, "ERROR: Cannot open image file \"%s\".\n", filename);
-        std::exit(EXIT_FAILURE);
-    }
-
-    printf("OK (%dx%d).\n", width, height);
-
-    // Agora criamos objetos na GPU com OpenGL para armazenar a textura
-    GLuint texture_id;
-    GLuint sampler_id;
-    glGenTextures(1, &texture_id);
-    glGenSamplers(1, &sampler_id);
-
-    // Veja slides 95-96 do documento Aula_20_Mapeamento_de_Texturas.pdf
-    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glSamplerParameteri(sampler_id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // Parâmetros de amostragem da textura.
-    glSamplerParameteri(sampler_id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glSamplerParameteri(sampler_id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    // Agora enviamos a imagem lida do disco para a GPU
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
-    glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
-    glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
-
-    GLuint textureunit = g_NumLoadedTextures;
-    glActiveTexture(GL_TEXTURE0 + textureunit);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindSampler(textureunit, sampler_id);
-
-    stbi_image_free(data);
-
-    g_NumLoadedTextures += 1;
-    return textureunit;
-}
-
 // Função que carrega os shaders de vértices e de fragmentos que serão
 // utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
 //
