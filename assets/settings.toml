@@ -15,6 +15,10 @@ diffuse = "../../assets/textures/Pants_diffuse.tga"
 normals = "../../assets/textures/Pants_normals.tga"
 specular = "../../assets/textures/Pants_specular.tga"
 
+[textures.maze]
+normals = "../../assets/textures/texture_wall.jpg"
+
+
 [shaders]
 vertex = "../../assets/shaders/shader_vertex.glsl"
 fragment = "../../assets/shaders/shader_fragment.glsl"
