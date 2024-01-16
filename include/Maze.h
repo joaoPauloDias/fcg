@@ -11,14 +11,17 @@ namespace maze{
     class Maze
     {
     private:
-        std::vector<std::vector<bool>> wall;
-        std::mt19937 g;
+        std::vector<std::pair<bool, glm::mat4>> blockMatrices_;
+        std::vector<std::vector<bool>> walls_;
+        std::mt19937 randomGenerator_;
+        int size_;
     public:
-        std::vector<std::pair<bool, glm::mat4>> blocks;
-        int size;
         Maze(int n);
         void generateDisplay();
         void generateBlocks();
         void display() const;
+        const std::vector<std::pair<bool, glm::mat4>>& getBlockMatrices() const {
+            return blockMatrices_;
+        }
     };
 }

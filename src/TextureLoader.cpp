@@ -6,7 +6,7 @@ using namespace texture;
 // Função que carrega uma imagem para ser utilizada como textura
 
 TextureLoader::TextureLoader(){
-    g_NumLoadedTextures = 0;
+    g_NumLoadedTextures_ = 0;
 }
 
 GLuint TextureLoader::LoadTexture(const char* filename)
@@ -48,7 +48,7 @@ GLuint TextureLoader::LoadTexture(const char* filename)
     glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
     glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
-    GLuint textureunit = g_NumLoadedTextures;
+    GLuint textureunit = g_NumLoadedTextures_;
     glActiveTexture(GL_TEXTURE0 + textureunit);
     glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB8, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
@@ -57,7 +57,7 @@ GLuint TextureLoader::LoadTexture(const char* filename)
 
     stbi_image_free(data);
 
-    g_NumLoadedTextures += 1;
+    g_NumLoadedTextures_ += 1;
     return textureunit;
 }
 

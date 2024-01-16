@@ -305,7 +305,7 @@ namespace engine
             g_VirtualScene["Pants_mesh"].ApplyModelMatrix(model);
             g_VirtualScene["Pants_mesh"].Draw();
 
-            for (auto [isWall, m] : myMaze.blocks)
+            for (auto [isWall, m] : myMaze.getBlockMatrices())
             {
                 g_VirtualScene[isWall ? "Wall" : "Ground"].ApplyModelMatrix(m);
                 g_VirtualScene[isWall ? "Wall" : "Ground"].Draw();
