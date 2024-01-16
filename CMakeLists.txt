@@ -18,6 +18,7 @@ set(SOURCES
   src/Engine.cpp
   src/TextureLoader.cpp
   src/Maze.cpp
+  src/VirtualScene.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
