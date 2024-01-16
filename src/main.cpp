@@ -56,6 +56,8 @@
 #include "Camera.h"
 #include "Engine.h"
 #include "TextureLoader.h"
+#include "Maze.h"
+
 #define MINOTAUR 0
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -113,16 +115,14 @@ bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mous
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
 // LookAtCamera camera(0.0f, 0.0f, 3.5f);
-FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 1.0f);
-
+FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 10.0f);
+maze::Maze myMaze(11);
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
-
 
 int main(int argc, char *argv[])
 {
     GLFWwindow *window = engine::Init();
-
     // Carregamos os shaders de vértices e de fragmentos que serão utilizados
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
     //
@@ -143,6 +143,8 @@ int main(int argc, char *argv[])
         }
     }
 
+    ObjModel wallmodel("../../assets/models/wall.obj");
+    ObjModel groundmodel("../../assets/models/ground.obj");
     ObjModel minotaurmodel("../../assets/models/minotaur.obj");
 
 
@@ -150,7 +152,8 @@ int main(int argc, char *argv[])
     g_VirtualScene["Eyes_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     g_VirtualScene["Teeth_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     g_VirtualScene["Pants_mesh"].setTextures(textureLoader.GetTexture("pants_diffuse"), textureLoader.GetTexture("pants_specular"), textureLoader.GetTexture("pants_normals"));
-
+    g_VirtualScene["Wall"].setTextures( textureLoader.GetTexture("wall_normals"), NULL,  textureLoader.GetTexture("wall_normals"));
+    g_VirtualScene["Ground"].setTextures( textureLoader.GetTexture("ground_normals"), NULL,  textureLoader.GetTexture("ground_normals"));
     engine::Run(window);
 
     // Fim do programa

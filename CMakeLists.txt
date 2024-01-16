@@ -17,6 +17,7 @@ set(SOURCES
   src/Camera.cpp
   src/Engine.cpp
   src/TextureLoader.cpp
+  src/Maze.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

@@ -114,8 +114,8 @@ void FreeCamera::update(float dt) {
 
     // Note que, no sistema de coordenadas da câmera, os planos near e far
     // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
-    float nearplane = -0.1f;  // Posição do "near plane"
-    float farplane  = -10.0f; // Posição do "far plane"
+    float nearplane = -0.01f;  // Posição do "near plane"
+    float farplane  = -100.0f; // Posição do "far plane"
 
     float field_of_view = 3.141592 / 3.0f;
     glm::mat4 projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);  
