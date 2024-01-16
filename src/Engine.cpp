@@ -8,13 +8,15 @@
 #include "globals.h"
 
 #include "SceneObject.h"
+#include "TextureLoader.h"
+#include "Maze.h"
 
 void LoadShadersFromFiles();
 void TextRendering_Init();
-void TextRendering_ShowFramesPerSecond(GLFWwindow* window);
+void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
 extern float g_ScreenRatio;
 extern std::map<std::string, SceneObject> g_VirtualScene;
-
+extern texture::TextureLoader textureLoader;
 extern FreeCamera camera;
 extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed; // Análogo para botão direito do mouse
@@ -22,9 +24,12 @@ extern bool g_MiddleMouseButtonPressed;
 extern bool g_ShowInfoText;
 extern double g_LastCursorPosX;
 extern double g_LastCursorPosY;
+extern maze::Maze myMaze;
 
-namespace engine{
-    GLFWwindow* Init() {
+namespace engine
+{
+    GLFWwindow *Init()
+    {
         // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
         // sistema operacional, onde poderemos renderizar com OpenGL.
         int success = glfwInit();
@@ -38,9 +43,9 @@ namespace engine{
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-        #ifdef __APPLE__
+#ifdef __APPLE__
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-        #endif
+#endif
 
         // Pedimos para utilizar o perfil "core", isto é, utilizaremos somente as
         // funções modernas de OpenGL.
@@ -64,7 +69,7 @@ namespace engine{
 
         // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
         // biblioteca GLAD.
-        gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+        gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 
         // Definimos a função de callback que será chamada sempre que a janela for
         // redimensionada, por consequência alterando o tamanho do "framebuffer"
@@ -73,14 +78,14 @@ namespace engine{
         FramebufferSizeCallback(window, 800, 600); // Forçamos a chamada do callback acima, para definir g_ScreenRatio.
 
         // Imprimimos no terminal informações sobre a GPU do sistema
-        const GLubyte *vendor      = glGetString(GL_VENDOR);
-        const GLubyte *renderer    = glGetString(GL_RENDERER);
-        const GLubyte *glversion   = glGetString(GL_VERSION);
+        const GLubyte *vendor = glGetString(GL_VENDOR);
+        const GLubyte *renderer = glGetString(GL_RENDERER);
+        const GLubyte *glversion = glGetString(GL_VERSION);
         const GLubyte *glslversion = glGetString(GL_SHADING_LANGUAGE_VERSION);
 
         printf("GPU: %s, %s, OpenGL %s, GLSL %s\n", vendor, renderer, glversion, glslversion);
 
-        //auto keyCallback = std::bind(&engine::Engine::KeyCallback, TheEngine);
+        // auto keyCallback = std::bind(&engine::Engine::KeyCallback, TheEngine);
         glfwSetKeyCallback(window, KeyCallback);
         // ... ou clicar os botões do mouse ...
         glfwSetMouseButtonCallback(window, MouseButtonCallback);
@@ -93,15 +98,15 @@ namespace engine{
     }
 
     // Definimos o callback para impressão de erros da GLFW no terminal
-    void ErrorCallback(int error, const char* description)
+    void ErrorCallback(int error, const char *description)
     {
         fprintf(stderr, "ERROR: GLFW: %s\n", description);
     }
-        
+
     // Definição da função que será chamada sempre que a janela do sistema
     // operacional for redimensionada, por consequência alterando o tamanho do
     // "framebuffer" (região de memória onde são armazenados os pixels da imagem).
-    void FramebufferSizeCallback(GLFWwindow* window, int width, int height)
+    void FramebufferSizeCallback(GLFWwindow *window, int width, int height)
     {
         // Indicamos que queremos renderizar em toda região do framebuffer. A
         // função "glViewport" define o mapeamento das "normalized device
@@ -119,9 +124,8 @@ namespace engine{
         g_ScreenRatio = (float)width / height;
     }
 
-
     // Função callback chamada sempre que o usuário aperta algum dos botões do mouse
-    void MouseButtonCallback(GLFWwindow* window, int button, int action, int mods)
+    void MouseButtonCallback(GLFWwindow *window, int button, int action, int mods)
     {
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
         {
@@ -175,7 +179,7 @@ namespace engine{
 
     // Função callback chamada sempre que o usuário movimentar o cursor do mouse em
     // cima da janela OpenGL.
-    void CursorPosCallback(GLFWwindow* window, double xpos, double ypos)
+    void CursorPosCallback(GLFWwindow *window, double xpos, double ypos)
     {
         // Abaixo executamos o seguinte: caso o botão esquerdo do mouse esteja
         // pressionado, computamos quanto que o mouse se movimento desde o último
@@ -188,9 +192,9 @@ namespace engine{
             // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
             float dx = xpos - g_LastCursorPosX;
             float dy = ypos - g_LastCursorPosY;
-        
+
             camera.handleCursor(dx, dy);
-        
+
             // Atualizamos as variáveis globais para armazenar a posição atual do
             // cursor como sendo a última posição conhecida do cursor.
             g_LastCursorPosX = xpos;
@@ -206,7 +210,7 @@ namespace engine{
         }
 
         if (g_MiddleMouseButtonPressed)
-        {    
+        {
             // Atualizamos as variáveis globais para armazenar a posição atual do
             // cursor como sendo a última posição conhecida do cursor.
             g_LastCursorPosX = xpos;
@@ -215,15 +219,15 @@ namespace engine{
     }
 
     // Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.
-    void ScrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+    void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
     {
         camera.handleScroll(xoffset, yoffset);
     }
 
     // Definição da função que será chamada sempre que o usuário pressionar alguma
     // tecla do teclado. Veja http://www.glfw.org/docs/latest/input_guide.html#input_key
-    void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mod)
-    {    
+    void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mod)
+    {
         // Se o usuário pressionar a tecla ESC, fechamos a janela.
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
@@ -240,12 +244,13 @@ namespace engine{
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {
             LoadShadersFromFiles();
-            fprintf(stdout,"Shaders recarregados!\n");
+            fprintf(stdout, "Shaders recarregados!\n");
             fflush(stdout);
         }
     }
 
-    void Run(GLFWwindow *window) {
+    void Run(GLFWwindow *window)
+    {
         // Inicializamos o código para renderização de texto.
         TextRendering_Init();
 
@@ -253,12 +258,12 @@ namespace engine{
         glEnable(GL_DEPTH_TEST);
 
         // Habilitamos o Backface Culling. Veja slides 23-34 do documento Aula_13_Clipping_and_Culling.pdf e slides 112-123 do documento Aula_14_Laboratorio_3_Revisao.pdf.
-        //glEnable(GL_CULL_FACE);
-        //glCullFace(GL_BACK);
-        //glFrontFace(GL_CCW);
+        // glEnable(GL_CULL_FACE);
+        // glCullFace(GL_BACK);
+        // glFrontFace(GL_CCW);
 
         double prev_time = glfwGetTime();
-        
+
         // Ficamos em um loop infinito, renderizando, até que o usuário feche a janela
         while (!glfwWindowShouldClose(window))
         {
@@ -287,7 +292,7 @@ namespace engine{
 
             glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
 
-            model = Matrix_Translate(0.0f,-1.0f,0.0f) * Matrix_Scale(0.02f, 0.02f, 0.02f);
+            model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.03f, 0.03f, 0.03f);
             g_VirtualScene["Eyes_mesh"].ApplyModelMatrix(model);
             g_VirtualScene["Eyes_mesh"].Draw();
 
@@ -299,7 +304,15 @@ namespace engine{
 
             g_VirtualScene["Pants_mesh"].ApplyModelMatrix(model);
             g_VirtualScene["Pants_mesh"].Draw();
-            
+
+            for (auto [isWall, m] : myMaze.getBlockMatrices())
+            {
+                g_VirtualScene[isWall ? "Wall" : "Ground"].ApplyModelMatrix(m);
+                g_VirtualScene[isWall ? "Wall" : "Ground"].Draw();
+            }
+
+            // myMaze.renderMaze();
+
             TextRendering_ShowFramesPerSecond(window);
 
             glfwSwapBuffers(window);

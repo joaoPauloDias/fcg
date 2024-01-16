@@ -1,0 +1,27 @@
+base_path = "../../assets"
+
+[models]
+minotaur = "../../assets/models/minotaur.obj"
+maze = "../../assets/models/maze.obj"
+sphere = "../../assets/models/sphere.obj"
+
+[textures.minotaur]
+diffuse = "../../assets/textures/Minotaur_diffuse.tga"
+normals = "../../assets/textures/Minotaur_normals.tga"
+specular = "../../assets/textures/Minotaur_specular.tga"
+
+[textures.pants]
+diffuse = "../../assets/textures/Pants_diffuse.tga"
+normals = "../../assets/textures/Pants_normals.tga"
+specular = "../../assets/textures/Pants_specular.tga"
+
+[textures.wall]
+normals = "../../assets/textures/texture_wall.jpg"
+
+[textures.ground]
+normals = "../../assets/textures/texture_ground.jpg"
+
+
+[shaders]
+vertex = "../../assets/shaders/shader_vertex.glsl"
+fragment = "../../assets/shaders/shader_fragment.glsl"
