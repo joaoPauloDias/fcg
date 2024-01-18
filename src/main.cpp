@@ -51,7 +51,6 @@
 #include "matrices.h"
 #include "textrendering.h"
 
-#include "SceneObject.h"
 #include "ObjModel.h"
 #include "Camera.h"
 #include "Engine.h"
@@ -75,7 +74,7 @@ GLint g_bbox_max_uniform;
 // (map).  Veja dentro da função BuildTrianglesAndAddToVirtualScene() como que são incluídos
 // objetos dentro da variável g_VirtualScene, e veja na função main() como
 // estes são acessados.
-std::map<std::string, SceneObject> g_VirtualScene;
+std::map<std::string, ModelPart> g_VirtualScene;
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);

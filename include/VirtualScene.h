@@ -6,7 +6,7 @@
 class VirtualScene {
     private:
         std::map<std::string, GameObject*> objects;
-    
+	
     public:
         VirtualScene();
         void RenderScene();
