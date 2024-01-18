@@ -7,15 +7,15 @@
 #include "matrices.h"
 #include "globals.h"
 
-#include "SceneObject.h"
 #include "TextureLoader.h"
+#include "ObjModel.h"
 #include "Maze.h"
 
 void LoadShadersFromFiles();
 void TextRendering_Init();
 void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
 extern float g_ScreenRatio;
-extern std::map<std::string, SceneObject> g_VirtualScene;
+extern std::map<std::string, ModelPart> g_VirtualScene;
 extern texture::TextureLoader textureLoader;
 extern FreeCamera camera;
 extern bool g_LeftMouseButtonPressed;
