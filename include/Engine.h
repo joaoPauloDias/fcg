@@ -3,6 +3,7 @@
 #include <glad/glad.h>
 #include "GLFW/glfw3.h"
 #include "Camera.h"
+#include "VirtualScene.h"
 
 enum class GameState {
     THESEU,
@@ -20,6 +21,7 @@ namespace engine
     void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
     void ErrorCallback(int error, const char* description);
     void Run(GLFWwindow *window);
+    void SetActiveScene(VirtualScene* scene);
 } // namespace engine
 
 

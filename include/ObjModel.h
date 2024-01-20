@@ -43,10 +43,15 @@ struct ObjModel {
     std::vector<tinyobj::material_t>  materials;
     
     std::map<std::string, ModelPart>  parts;
+    glm::mat4 modelMatrix;
+
     // Este construtor lê o modelo de um arquivo utilizando a biblioteca tinyobjloader.
     // Veja: https://github.com/syoyo/tinyobjloader
     ObjModel(const char* filename, const char* basepath = NULL, bool triangulate = true);
     void ComputeNormals();
-    void BuildTrianglesAndAddToVirtualScene();
+    void BuildTriangles();
     void PrintObjModelInfo();
+    void ApplyModelMatrix(glm::mat4x4 model_matrix);
+    void Draw();
+    ModelPart* GetPart(std::string name);
 };

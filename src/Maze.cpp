@@ -3,9 +3,14 @@
 #include <algorithm>
 using namespace maze;
 
-Maze::Maze(int n)
-    : size_(n), randomGenerator_(std::random_device{}())
+Maze::Maze(texture::TextureLoader textureLoader, int n)
+    : size_(n), randomGenerator_(std::random_device{}()), 
+      wallModel("../../assets/models/wall.obj"), 
+      groundModel("../../assets/models/ground.obj")
 {
+    wallModel.GetPart("Wall")->setTextures(textureLoader.GetTexture("wall_normals"), NULL, textureLoader.GetTexture("wall_normals"));
+    groundModel.GetPart("Ground")->setTextures(textureLoader.GetTexture("ground_normals"), NULL, textureLoader.GetTexture("ground_normals"));
+
     walls_ = std::vector<std::vector<bool>>(size_, std::vector<bool>(size_, true));
     generateDisplay();
     display();
@@ -64,3 +69,18 @@ void Maze::generateBlocks()
     }
 }
 
+void Maze::Render() {
+    for (auto &&[isWall, m] : getBlockMatrices()) {
+        if (isWall) {
+            wallModel.ApplyModelMatrix(m);
+            wallModel.Draw();
+        } else {
+            groundModel.ApplyModelMatrix(m);
+            groundModel.Draw();
+        }
+    }
+}
+
+void Maze::Update(float dt) {
+    std::cout << "Updating maze\n";
+}

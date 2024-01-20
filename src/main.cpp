@@ -56,6 +56,7 @@
 #include "Engine.h"
 #include "TextureLoader.h"
 #include "Maze.h"
+#include "VirtualScene.h"
 
 #define MINOTAUR 0
 
@@ -70,11 +71,6 @@ GLint g_bbox_max_uniform;
 
 // Abaixo definimos variáveis globais utilizadas em várias funções do código.
 
-// A cena virtual é uma lista de objetos nomeados, guardados em um dicionário
-// (map).  Veja dentro da função BuildTrianglesAndAddToVirtualScene() como que são incluídos
-// objetos dentro da variável g_VirtualScene, e veja na função main() como
-// estes são acessados.
-std::map<std::string, ModelPart> g_VirtualScene;
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);
@@ -115,7 +111,7 @@ bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mous
 
 // LookAtCamera camera(0.0f, 0.0f, 3.5f);
 FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 10.0f);
-maze::Maze myMaze(11);
+
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
 
@@ -142,17 +138,13 @@ int main(int argc, char *argv[])
         }
     }
 
-    ObjModel wallmodel("../../assets/models/wall.obj");
-    ObjModel groundmodel("../../assets/models/ground.obj");
-    ObjModel minotaurmodel("../../assets/models/minotaur.obj");
+    VirtualScene scene;
 
+    maze::Maze myMaze(textureLoader, 11);
+    scene.AddObject("maze", &myMaze);
 
-    g_VirtualScene["Body_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
-    g_VirtualScene["Eyes_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
-    g_VirtualScene["Teeth_mesh"].setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
-    g_VirtualScene["Pants_mesh"].setTextures(textureLoader.GetTexture("pants_diffuse"), textureLoader.GetTexture("pants_specular"), textureLoader.GetTexture("pants_normals"));
-    g_VirtualScene["Wall"].setTextures( textureLoader.GetTexture("wall_normals"), NULL,  textureLoader.GetTexture("wall_normals"));
-    g_VirtualScene["Ground"].setTextures( textureLoader.GetTexture("ground_normals"), NULL,  textureLoader.GetTexture("ground_normals"));
+    engine::SetActiveScene(&scene);
+
     engine::Run(window);
 
     // Fim do programa
