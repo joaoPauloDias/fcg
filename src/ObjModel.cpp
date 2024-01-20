@@ -8,8 +8,6 @@
 #include "matrices.h"
 #include "globals.h"
 
-extern std::map<std::string, ModelPart> g_VirtualScene;
-
 int numObjects = 0;
 
 ObjModel::ObjModel(const char* filename, const char* basepath, bool triangulate) {
@@ -54,9 +52,12 @@ ObjModel::ObjModel(const char* filename, const char* basepath, bool triangulate)
         }
         printf("- Objeto '%s'\n", shapes[shape].name.c_str());
     }
-
+    /*
+    for (auto x: materials) {
+        printf("Map Kd: %s\n", x.diffuse_texname.c_str());
+    }*/
     ComputeNormals();
-    BuildTrianglesAndAddToVirtualScene();
+    BuildTriangles();
     printf("OK.\n");
 }
 
@@ -120,7 +121,7 @@ void ObjModel::ComputeNormals() {
     }
 }
 
-void ObjModel::BuildTrianglesAndAddToVirtualScene() {
+void ObjModel::BuildTriangles() {
     GLuint vertex_array_object_id;
     glGenVertexArrays(1, &vertex_array_object_id);
     glBindVertexArray(vertex_array_object_id);
@@ -207,7 +208,7 @@ void ObjModel::BuildTrianglesAndAddToVirtualScene() {
         theobject.id = numObjects;
         numObjects++;
 
-        g_VirtualScene[shapes[shape].name] = theobject;
+        parts[shapes[shape].name] = theobject;
     }
 
     GLuint VBO_model_coefficients_id;
@@ -498,4 +499,20 @@ void ModelPart::setTextures(GLuint* diffuse, GLuint* specular, GLuint* normals) 
     } else {
         useNormalsTexture = false;
     }
+}
+
+void ObjModel::ApplyModelMatrix(glm::mat4x4 matrix) {
+    for (auto &&[name, part] : parts) {
+        part.ApplyModelMatrix(matrix);
+    }
+}
+
+void ObjModel::Draw() {
+    for (auto &&[name, part] : parts) {
+        part.Draw();
+    }
+}
+
+ModelPart* ObjModel::GetPart(std::string name) {
+    return &parts[name];
 }

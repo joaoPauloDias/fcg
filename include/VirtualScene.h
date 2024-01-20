@@ -1,3 +1,5 @@
+#pragma once
+
 #include "GameObject.h"
 
 #include <map>
@@ -8,7 +10,6 @@ class VirtualScene {
         std::map<std::string, GameObject*> objects;
 	
     public:
-        VirtualScene();
         void RenderScene();
         void Update(float dt);
         void AddObject(std::string name, GameObject *object);
