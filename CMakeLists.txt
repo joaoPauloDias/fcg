@@ -11,13 +11,13 @@ set(SOURCES
   src/tiny_obj_loader.cpp
   src/stb_image.cpp
   src/glad.c
-  src/SceneObject.cpp
   src/ObjModel.cpp
   src/matrices.cpp
   src/Camera.cpp
   src/Engine.cpp
   src/TextureLoader.cpp
   src/Maze.cpp
+  src/VirtualScene.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

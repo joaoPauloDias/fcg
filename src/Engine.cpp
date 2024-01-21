@@ -7,16 +7,14 @@
 #include "matrices.h"
 #include "globals.h"
 
-#include "SceneObject.h"
 #include "TextureLoader.h"
+#include "ObjModel.h"
 #include "Maze.h"
 
 void LoadShadersFromFiles();
 void TextRendering_Init();
 void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
 extern float g_ScreenRatio;
-extern std::map<std::string, SceneObject> g_VirtualScene;
-extern texture::TextureLoader textureLoader;
 extern FreeCamera camera;
 extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed; // Análogo para botão direito do mouse
@@ -24,10 +22,12 @@ extern bool g_MiddleMouseButtonPressed;
 extern bool g_ShowInfoText;
 extern double g_LastCursorPosX;
 extern double g_LastCursorPosY;
-extern maze::Maze myMaze;
+
 
 namespace engine
 {
+    VirtualScene *activeScene;
+
     GLFWwindow *Init()
     {
         // Inicializamos a biblioteca GLFW, utilizada para criar uma janela do
@@ -258,9 +258,9 @@ namespace engine
         glEnable(GL_DEPTH_TEST);
 
         // Habilitamos o Backface Culling. Veja slides 23-34 do documento Aula_13_Clipping_and_Culling.pdf e slides 112-123 do documento Aula_14_Laboratorio_3_Revisao.pdf.
-        // glEnable(GL_CULL_FACE);
-        // glCullFace(GL_BACK);
-        // glFrontFace(GL_CCW);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glFrontFace(GL_CCW);
 
         double prev_time = glfwGetTime();
 
@@ -293,25 +293,8 @@ namespace engine
             glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
 
             model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.03f, 0.03f, 0.03f);
-            g_VirtualScene["Eyes_mesh"].ApplyModelMatrix(model);
-            g_VirtualScene["Eyes_mesh"].Draw();
 
-            g_VirtualScene["Body_mesh"].ApplyModelMatrix(model);
-            g_VirtualScene["Body_mesh"].Draw();
-
-            g_VirtualScene["Teeth_mesh"].ApplyModelMatrix(model);
-            g_VirtualScene["Teeth_mesh"].Draw();
-
-            g_VirtualScene["Pants_mesh"].ApplyModelMatrix(model);
-            g_VirtualScene["Pants_mesh"].Draw();
-
-            for (auto [isWall, m] : myMaze.getBlockMatrices())
-            {
-                g_VirtualScene[isWall ? "Wall" : "Ground"].ApplyModelMatrix(m);
-                g_VirtualScene[isWall ? "Wall" : "Ground"].Draw();
-            }
-
-            // myMaze.renderMaze();
+            activeScene->RenderScene();
 
             TextRendering_ShowFramesPerSecond(window);
 
@@ -321,5 +304,9 @@ namespace engine
 
         // Finalizamos o uso dos recursos do sistema operacional
         glfwTerminate();
+    }
+
+    void SetActiveScene(VirtualScene* scene) {
+        activeScene = scene;
     }
 }

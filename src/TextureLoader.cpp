@@ -67,5 +67,8 @@ void TextureLoader::LoadTexture(std::string texture, const char* filename){
 }
 
 GLuint* TextureLoader::GetTexture(std::string texture){
+    if (textures_.find(texture) == textures_.end()) {
+        return NULL;
+    }
     return &textures_[texture];
 }
