@@ -1,4 +1,5 @@
 #include "VirtualScene.h"
+#include "GameObject.h"
 
 void VirtualScene::RenderScene() {
     for (auto &&[name, object]: objects) {

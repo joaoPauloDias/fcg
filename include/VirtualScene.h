@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GameObject.h"
+class GameObject; // Declaration to break circular dependency between GameObject and VirtualScene
 
 #include <map>
 #include <string>

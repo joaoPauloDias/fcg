@@ -1,6 +1,6 @@
 #pragma once
 
-class VirtualScene; // Declaration to break circular dependency between GameObject and VirtualScene
+#include "VirtualScene.h"
 
 class GameObject {
     private:

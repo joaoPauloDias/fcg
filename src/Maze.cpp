@@ -2,8 +2,6 @@
 #include <iostream>
 #include <algorithm>
 
-#include "VirtualScene.h"
-
 using namespace maze;
 
 Maze::Maze(texture::TextureLoader textureLoader, int n)
