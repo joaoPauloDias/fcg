@@ -300,6 +300,7 @@ namespace engine
 
             glfwSwapBuffers(window);
             glfwPollEvents();
+            activeScene->Update(dt);
         }
 
         // Finalizamos o uso dos recursos do sistema operacional

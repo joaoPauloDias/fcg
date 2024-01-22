@@ -1,6 +1,9 @@
 #include "Maze.h"
 #include <iostream>
 #include <algorithm>
+
+#include "VirtualScene.h"
+
 using namespace maze;
 
 Maze::Maze(texture::TextureLoader textureLoader, int n)
@@ -8,8 +11,16 @@ Maze::Maze(texture::TextureLoader textureLoader, int n)
       wallModel("../../assets/models/wall.obj"), 
       groundModel("../../assets/models/ground.obj")
 {
-    wallModel.GetPart("Wall")->setTextures(textureLoader.GetTexture("wall_normals"), NULL, textureLoader.GetTexture("wall_normals"));
-    groundModel.GetPart("Ground")->setTextures(textureLoader.GetTexture("ground_normals"), NULL, textureLoader.GetTexture("ground_normals"));
+    groundModel.GetPart("Ground")->setTextures(
+        textureLoader.GetTexture("ground_diffuse"), 
+        textureLoader.GetTexture("ground_specular"), 
+        textureLoader.GetTexture("ground_normals")
+    );
+    wallModel.GetPart("Wall")->setTextures(
+        textureLoader.GetTexture("wall_diffuse"), 
+        textureLoader.GetTexture("wall_specular"), 
+        textureLoader.GetTexture("wall_normals")
+    );
 
     walls_ = std::vector<std::vector<bool>>(size_, std::vector<bool>(size_, true));
     generateDisplay();
@@ -81,6 +92,4 @@ void Maze::Render() {
     }
 }
 
-void Maze::Update(float dt) {
-    std::cout << "Updating maze\n";
-}
+void Maze::Update(float dt) {}

@@ -483,6 +483,7 @@ void ModelPart::setTextures(GLuint* diffuse, GLuint* specular, GLuint* normals) 
         texture_diffuse = *diffuse;
         useDiffuseTexture = true;
     } else {
+        texture_diffuse = NULL;
         useDiffuseTexture = false;
     }
 
@@ -490,6 +491,7 @@ void ModelPart::setTextures(GLuint* diffuse, GLuint* specular, GLuint* normals) 
         texture_specular = *specular;
         useSpecularTexture = true;
     } else {
+        texture_specular = NULL;
         useSpecularTexture = false;
     }
 
@@ -497,6 +499,7 @@ void ModelPart::setTextures(GLuint* diffuse, GLuint* specular, GLuint* normals) 
         texture_normals = *normals;
         useNormalsTexture = true;
     } else {
+        texture_normals = NULL;
         useNormalsTexture = false;
     }
 }

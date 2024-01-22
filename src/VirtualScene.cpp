@@ -14,9 +14,11 @@ void VirtualScene::Update(float dt) {
 
 void VirtualScene::AddObject(std::string name, GameObject *object) {
     objects[name] = object;
+    object->setScene(this);
 }
 
 GameObject *VirtualScene::GetObject(std::string name) {
+    if (objects.find(name) == objects.end())
+        return NULL;
     return objects[name];
 }
-

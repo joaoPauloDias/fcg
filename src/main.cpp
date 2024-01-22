@@ -57,8 +57,8 @@
 #include "TextureLoader.h"
 #include "Maze.h"
 #include "VirtualScene.h"
+#include "Minotaur.h"
 
-#define MINOTAUR 0
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
 GLuint g_GpuProgramID = 0;
@@ -141,7 +141,10 @@ int main(int argc, char *argv[])
     VirtualScene scene;
 
     maze::Maze myMaze(textureLoader, 11);
+    Minotaur minotaur(textureLoader);
+
     scene.AddObject("maze", &myMaze);
+    scene.AddObject("minotaur", &minotaur);
 
     engine::SetActiveScene(&scene);
 
