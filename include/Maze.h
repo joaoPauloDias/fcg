@@ -27,6 +27,9 @@ namespace maze{
         const std::vector<std::pair<bool, glm::mat4>>& getBlockMatrices() const {
             return blockMatrices_;
         }
+        const ObjModel& getModel() const {
+            return wallModel;
+        }
         void Render();
         void Update(float dt);
     };
