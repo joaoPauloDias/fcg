@@ -11,7 +11,7 @@ class VirtualScene {
 	
     public:
         void RenderScene();
-        void Update(float dt);
+        void UpdateScene(float dt);
         void AddObject(std::string name, GameObject *object);
         GameObject* GetObject(std::string name);
 };

@@ -56,6 +56,8 @@
 #include "Engine.h"
 #include "TextureLoader.h"
 #include "Maze.h"
+#include "Theseus.h"
+
 #include "VirtualScene.h"
 
 #define MINOTAUR 0
@@ -110,7 +112,7 @@ bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mous
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
 // LookAtCamera camera(0.0f, 0.0f, 3.5f);
-FreeCamera camera(3.14f, -0.7f, glm::vec4(0.0f, 2.0f, 3.0f, 1.0f), 10.0f);
+FreeCamera camera(3.14f, -0.7f, glm::vec4(1.5f, 0.2f, 1.5f, 1.0f), 5.0f);
 
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
@@ -142,6 +144,9 @@ int main(int argc, char *argv[])
 
     maze::Maze myMaze(textureLoader, 11);
     scene.AddObject("maze", &myMaze);
+
+    theseus::Theseus myTheseus(textureLoader, &camera);
+    scene.AddObject("theseus", &myTheseus);
 
     engine::SetActiveScene(&scene);
 

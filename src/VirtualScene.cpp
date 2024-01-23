@@ -6,7 +6,7 @@ void VirtualScene::RenderScene() {
     }
 }
 
-void VirtualScene::Update(float dt) {
+void VirtualScene::UpdateScene(float dt) {
     for (auto &&[name, object]: objects) {
         object->Update(dt);
     }
