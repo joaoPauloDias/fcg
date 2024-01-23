@@ -1,5 +1,8 @@
 #include "Theseus.h"
 #include "matrices.h"
+#include "ShaderManager.h"
+
+extern shaders::ShaderManager shaderManager;
 
 using namespace theseus;
 
@@ -12,6 +15,7 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
 
 
 void Theseus::Render() {
+    //shaderManager.UseProgram("default");
     swordModel.ApplyModelMatrix(swordModel.modelMatrix);
     swordModel.Draw();
 }

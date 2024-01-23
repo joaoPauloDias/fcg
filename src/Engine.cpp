@@ -8,9 +8,11 @@
 #include "globals.h"
 
 #include "TextureLoader.h"
+#include "ShaderManager.h"
 #include "ObjModel.h"
 #include "Maze.h"
 
+extern shaders::ShaderManager shaderManager;
 void LoadShadersFromFiles();
 void TextRendering_Init();
 void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
@@ -262,7 +264,8 @@ namespace engine
         // Se o usuário apertar a tecla R, recarregamos os shaders dos arquivos "shader_fragment.glsl" e "shader_vertex.glsl".
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {
-            LoadShadersFromFiles();
+            shaderManager.LoadProgram("default", "../../assets/shaders/shader_vertex.glsl", "../../assets/shaders/shader_fragment.glsl");
+            shaderManager.UseProgram("default");
             fprintf(stdout, "Shaders recarregados!\n");
             fflush(stdout);
         }
@@ -303,8 +306,6 @@ namespace engine
             // e também resetamos todos os pixels do Z-buffer (depth buffer).
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-            // Pedimos para a GPU utilizar o programa de GPU criado acima (contendo
-            // os shaders de vértice e fragmentos).
             glUseProgram(g_GpuProgramID);
 
             glm::vec4 newCameraPosition = camera.getNewPosition(dt);
