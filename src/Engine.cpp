@@ -333,6 +333,7 @@ namespace engine
 
             // model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.03f, 0.03f, 0.03f);
 
+            activeScene->UpdateScene(dt);
             activeScene->RenderScene();
 
             TextRendering_ShowFramesPerSecond(window);
