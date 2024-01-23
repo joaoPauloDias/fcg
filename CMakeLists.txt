@@ -19,6 +19,7 @@ set(SOURCES
   src/Maze.cpp
   src/VirtualScene.cpp
   src/Theseus.cpp
+  src/ShaderManager.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
