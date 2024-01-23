@@ -56,6 +56,8 @@
 #include "Engine.h"
 #include "TextureLoader.h"
 #include "Maze.h"
+#include "Theseus.h"
+
 #include "VirtualScene.h"
 
 #define MINOTAUR 0
@@ -142,6 +144,9 @@ int main(int argc, char *argv[])
 
     maze::Maze myMaze(textureLoader, 11);
     scene.AddObject("maze", &myMaze);
+
+    theseus::Theseus myTheseus(textureLoader, &camera);
+    scene.AddObject("theseus", &myTheseus);
 
     engine::SetActiveScene(&scene);
 
