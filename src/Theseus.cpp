@@ -7,14 +7,15 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     :
       swordModel("../../assets/models/sword.obj"), freeCamera(camera)
 {
-    swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_normals"),NULL, textureLoader.GetTexture("sword_normals"));
+    swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_normals"),NULL,NULL);
 }
 
 
 void Theseus::Render() {
-    Update(1.0f);
+    swordModel.ApplyModelMatrix(swordModel.modelMatrix);
     swordModel.Draw();
 }
+
 void Theseus::Update(float dt) {
     float r = 0.2f;
     float y = r * sin(freeCamera->phi);
@@ -37,5 +38,5 @@ void Theseus::Update(float dt) {
                             * glm::inverse(rotationMatrix)
                             * Matrix_Scale(0.04f, 0.04f, 0.04f);
 
-    swordModel.ApplyModelMatrix(modelMatrix);
+    swordModel.modelMatrix = modelMatrix;
 }
