@@ -1,7 +1,10 @@
 #include "Maze.h"
 #include <iostream>
 #include <algorithm>
+#include "ShaderManager.h"
 using namespace maze;
+
+extern shaders::ShaderManager shaderManager;
 
 Maze::Maze(texture::TextureLoader textureLoader, int n)
     : size_(n), randomGenerator_(std::random_device{}()), 
@@ -70,6 +73,7 @@ void Maze::generateBlocks()
 }
 
 void Maze::Render() {
+    shaderManager.UseProgram("diffuse");
     for (auto &&[isWall, m] : getBlockMatrices()) {
         if (isWall) {
             wallModel.ApplyModelMatrix(m);
@@ -79,8 +83,9 @@ void Maze::Render() {
             groundModel.Draw();
         }
     }
+    
 }
 
 void Maze::Update(float dt) {
-    std::cout << "Updating maze\n";
+    //std::cout << "Updating maze\n";
 }

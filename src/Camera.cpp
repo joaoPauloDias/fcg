@@ -10,7 +10,7 @@
 
 extern float g_ScreenRatio;
 
-const bool FREE = false;
+bool FREE = false;
 
 LookAtCamera::LookAtCamera(float t, float p, float d) {
     theta = t;
@@ -195,6 +195,12 @@ void FreeCamera::handleKey(int key, int scancode, int action, int mod) {
             dPressed = true;
         } else if (action == GLFW_RELEASE) {
             dPressed = false;
+        }
+    }
+
+    if (key == GLFW_KEY_LEFT_SHIFT) {
+        if (action == GLFW_PRESS) {
+            FREE = !FREE;
         }
     }
 }
