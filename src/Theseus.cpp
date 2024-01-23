@@ -28,7 +28,7 @@ void Theseus::Update(float dt) {
 
     glm::vec4 cameraToModel = (modelPosition - glm::vec4(freeCamera->position)) /  norm((modelPosition - glm::vec4(freeCamera->position)));
 
-    glm::vec4 modelUp = glm::vec4(0, 1, 0, 0); 
+    glm::vec4 modelUp = glm::vec4(0.2, 1, 0, 0); 
     glm::vec4 modelRight = crossproduct(cameraToModel, modelUp);
     modelRight = modelRight / norm(modelRight);
 
