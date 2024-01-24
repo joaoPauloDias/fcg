@@ -8,11 +8,10 @@
 #include "globals.h"
 
 #include "TextureLoader.h"
-#include "ShaderManager.h"
 #include "ObjModel.h"
 #include "Maze.h"
 
-extern shaders::ShaderManager shaderManager;
+
 void LoadShadersFromFiles();
 void TextRendering_Init();
 void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
@@ -24,25 +23,6 @@ extern bool g_MiddleMouseButtonPressed;
 extern bool g_ShowInfoText;
 extern double g_LastCursorPosX;
 extern double g_LastCursorPosY;
-
-
-bool cubeSphereCollision(const glm::vec4& cameraPos, float radius, const glm::vec3& bbox_min, const glm::vec3& bbox_max, const glm::mat4& modelMatrix) {
-    // Inverse transform the camera position
-    glm::vec4 transformedCameraPos = glm::inverse(modelMatrix) * cameraPos;
-
-    // Clamping the sphere's center to the closest point inside the cube
-    float clampedX = std::max(bbox_min.x, std::min(transformedCameraPos.x, bbox_max.x));
-    float clampedY = std::max(bbox_min.y, std::min(transformedCameraPos.y, bbox_max.y));
-    float clampedZ = std::max(bbox_min.z, std::min(transformedCameraPos.z, bbox_max.z));
-
-    // Calculate the distance between the sphere's center and this clamped point
-    glm::vec3 closestPointInCube = glm::vec3(clampedX, clampedY, clampedZ);
-    glm::vec3 sphereCenter = glm::vec3(transformedCameraPos);
-    float distanceSquared = glm::length(sphereCenter - closestPointInCube);
-
-    // Check if the distance is less than or equal to the radius
-    return distanceSquared <= (radius * radius);
-}
 
 
 namespace engine
@@ -264,8 +244,7 @@ namespace engine
         // Se o usuário apertar a tecla R, recarregamos os shaders dos arquivos "shader_fragment.glsl" e "shader_vertex.glsl".
         if (key == GLFW_KEY_R && action == GLFW_PRESS)
         {
-            shaderManager.LoadProgram("default", "../../assets/shaders/shader_vertex.glsl", "../../assets/shaders/shader_fragment.glsl");
-            shaderManager.UseProgram("default");
+            LoadShadersFromFiles();
             fprintf(stdout, "Shaders recarregados!\n");
             fflush(stdout);
         }
@@ -307,33 +286,8 @@ namespace engine
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
             glUseProgram(g_GpuProgramID);
-
-            glm::vec4 newCameraPosition = camera.getNewPosition(dt);
-
-            GameObject* gameObject = activeScene->GetObject("maze");
-
-            // Cast it to Maze*
-            maze::Maze* maze = dynamic_cast<maze::Maze*>(gameObject);
             
-            bool check = true;
-            auto model = maze->getModel();
-            for(auto  &&[isWall, m] : maze->getBlockMatrices()){
-                for(auto &&[partName, partModel]:model.parts){
-                    if(cubeSphereCollision(newCameraPosition, 0.5f, partModel.bbox_min, partModel.bbox_max, m)){
-                        check = false;
-                        break;
-                    }
-                }
-                if(!check)break;
-            }
-
-            if(check)camera.update(newCameraPosition);
-
-
-            // glm::mat4 model = Matrix_Identity(); // Transformação identidade de modelagem
-
-            // model = Matrix_Translate(0.0f, -1.0f, 0.0f) * Matrix_Scale(0.03f, 0.03f, 0.03f);
-
+            camera.update(dt);
             activeScene->UpdateScene(dt);
             activeScene->RenderScene();
 

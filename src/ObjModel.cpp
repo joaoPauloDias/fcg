@@ -7,9 +7,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "matrices.h"
 #include "globals.h"
-#include "ShaderManager.h"
 
-extern shaders::ShaderManager shaderManager;
 
 int numObjects = 0;
 
@@ -434,8 +432,6 @@ void ObjModel::PrintObjModelInfo() {
 
 
 void ModelPart::Draw() {
-    GLuint programId = shaderManager.GetActiveProgram();
-
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "useNormalsTexture"), useNormalsTexture);
     if (useNormalsTexture) {
         glUniform1i(glGetUniformLocation(g_GpuProgramID, "TextureNormals"), texture_normals);

@@ -32,5 +32,6 @@ namespace maze{
         }
         void Render();
         void Update(float dt);
+        bool checkCollision(glm::vec4 position, float radius);
     };
 }
