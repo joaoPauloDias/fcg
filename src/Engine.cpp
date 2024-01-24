@@ -1,10 +1,14 @@
 #include "Engine.h"
+
+
 #include <cstdio>
 #include <map>
 #include <string>
 #include <stdexcept>
 
 #include "matrices.h"
+#include "textrendering.h"
+#include "utils.h"
 #include "globals.h"
 
 #include "TextureLoader.h"
@@ -14,15 +18,22 @@
 
 void LoadShadersFromFiles();
 void TextRendering_Init();
-void TextRendering_ShowFramesPerSecond(GLFWwindow *window);
 extern float g_ScreenRatio;
 extern FreeCamera camera;
-extern bool g_LeftMouseButtonPressed;
-extern bool g_RightMouseButtonPressed; // Análogo para botão direito do mouse
-extern bool g_MiddleMouseButtonPressed;
-extern bool g_ShowInfoText;
-extern double g_LastCursorPosX;
-extern double g_LastCursorPosY;
+
+// Variável que controla se o texto informativo será mostrado na tela.
+bool g_ShowInfoText = true;
+
+// Variáveis globais que armazenam a última posição do cursor do mouse, para
+// que possamos calcular quanto que o mouse se movimentou entre dois instantes
+// de tempo. Utilizadas no callback CursorPosCallback() abaixo.
+double g_LastCursorPosX, g_LastCursorPosY;
+
+// "g_LeftMouseButtonPressed = true" se o usuário está com o botão esquerdo do mouse
+// pressionado no momento atual. Veja função MouseButtonCallback().
+bool g_LeftMouseButtonPressed = false;
+bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mouse
+bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
 
 namespace engine
@@ -250,6 +261,46 @@ namespace engine
         }
     }
 
+    void SetActiveScene(VirtualScene* scene) {
+        activeScene = scene;
+    }
+
+    // Escrevemos na tela o número de quadros renderizados por segundo (frames per
+    // second).
+    void TextRendering_ShowFramesPerSecond(GLFWwindow *window)
+    {
+        if (!g_ShowInfoText)
+            return;
+
+        // Variáveis estáticas (static) mantém seus valores entre chamadas
+        // subsequentes da função!
+        static float old_seconds = (float)glfwGetTime();
+        static int ellapsed_frames = 0;
+        static char buffer[20] = "?? fps";
+        static int numchars = 7;
+
+        ellapsed_frames += 1;
+
+        // Recuperamos o número de segundos que passou desde a execução do programa
+        float seconds = (float)glfwGetTime();
+
+        // Número de segundos desde o último cálculo do fps
+        float ellapsed_seconds = seconds - old_seconds;
+
+        if (ellapsed_seconds > 1.0f)
+        {
+            numchars = snprintf(buffer, 20, "%.2f fps", ellapsed_frames / ellapsed_seconds);
+
+            old_seconds = seconds;
+            ellapsed_frames = 0;
+        }
+
+        float lineheight = TextRendering_LineHeight(window);
+        float charwidth = TextRendering_CharWidth(window);
+
+        TextRendering_PrintString(window, buffer, 1.0f - (numchars + 1) * charwidth, 1.0f - lineheight, 1.0f);
+    }
+
     void Run(GLFWwindow *window)
     {
         // Inicializamos o código para renderização de texto.
@@ -299,10 +350,6 @@ namespace engine
 
         // Finalizamos o uso dos recursos do sistema operacional
         glfwTerminate();
-    }
-
-    void SetActiveScene(VirtualScene* scene) {
-        activeScene = scene;
     }
 }
 
