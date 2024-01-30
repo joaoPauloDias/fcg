@@ -1,15 +1,19 @@
 #include "Maze.h"
 #include <iostream>
 #include <algorithm>
+#include "collisions.h"
+#include "globals.h"
+
 using namespace maze;
+
 
 Maze::Maze(texture::TextureLoader textureLoader, int n)
     : size_(n), randomGenerator_(std::random_device{}()), 
       wallModel("../../assets/models/wall.obj"), 
       groundModel("../../assets/models/ground.obj")
 {
-    wallModel.GetPart("Wall")->setTextures(textureLoader.GetTexture("wall_normals"), NULL, textureLoader.GetTexture("wall_normals"));
-    groundModel.GetPart("Ground")->setTextures(textureLoader.GetTexture("ground_normals"), NULL, textureLoader.GetTexture("ground_normals"));
+    wallModel.GetPart("Wall")->setTextures(textureLoader.GetTexture("wall_normals"), NULL, NULL);
+    groundModel.GetPart("Ground")->setTextures(textureLoader.GetTexture("ground_normals"), NULL, NULL);
 
     walls_ = std::vector<std::vector<bool>>(size_, std::vector<bool>(size_, true));
     generateDisplay();
@@ -70,6 +74,7 @@ void Maze::generateBlocks()
 }
 
 void Maze::Render() {
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), 0);
     for (auto &&[isWall, m] : getBlockMatrices()) {
         if (isWall) {
             wallModel.ApplyModelMatrix(m);
@@ -82,5 +87,21 @@ void Maze::Render() {
 }
 
 void Maze::Update(float dt) {
-    std::cout << "Updating maze\n";
+    //std::cout << "Updating maze\n";
+}
+
+bool Maze::checkCollision(glm::vec4 position, float radius) {
+    bool collision = false;
+    for (auto  &&[isWall, m] : getBlockMatrices()){
+        for (auto &&[partName, partModel]: wallModel.parts){
+            if(cubeSphereCollision(position, radius, partModel.bbox_min, partModel.bbox_max, m)){
+                collision = true;
+                break;
+            }
+        }
+        if (collision) {
+            break;
+        }
+    }
+    return collision;
 }

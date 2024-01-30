@@ -1,5 +1,8 @@
 #include "Theseus.h"
+
+#include "Maze.h"
 #include "matrices.h"
+#include "globals.h"
 
 using namespace theseus;
 
@@ -8,35 +11,31 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
       swordModel("../../assets/models/sword.obj"), freeCamera(camera)
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_normals"),NULL,NULL);
+    position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
 }
 
 
 void Theseus::Render() {
-    swordModel.ApplyModelMatrix(swordModel.modelMatrix);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), 1);
+    swordModel.ApplyModelMatrix(modelMatrix);
     swordModel.Draw();
 }
 
 void Theseus::Update(float dt) {
-    float r = 0.2f;
-    float y = r * sin(freeCamera->phi);
-    float z = r * cos(freeCamera->phi) * cos(freeCamera->theta);
-    float x = r * cos(freeCamera->phi) * sin(freeCamera->theta);
+    // It is important to compute the sword model matrix before updating the position attribute
+    // to draw the sword in the correct position
+    glm::vec4 swordPosition = position + freeCamera->view_vector * 0.2f;
+    modelMatrix = 
+        Matrix_Translate(swordPosition.x, swordPosition.y - 0.1f, swordPosition.z) * 
+        Matrix_Rotate_Y(freeCamera->theta + M_PI_2) *
+        Matrix_Scale(0.04f, 0.04f, 0.04f);
 
-    glm::vec4 direction = glm::vec4(x, y, z, 0.0f); 
-    direction = direction / norm(direction);
-    glm::vec4 modelPosition = glm::vec4(freeCamera->position) + direction * r;
+    glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt);
+    
+    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
 
-    glm::vec4 cameraToModel = (modelPosition - glm::vec4(freeCamera->position)) /  norm((modelPosition - glm::vec4(freeCamera->position)));
-
-    glm::vec4 modelUp = glm::vec4(0.2, 1, 0, 0); 
-    glm::vec4 modelRight = crossproduct(cameraToModel, modelUp);
-    modelRight = modelRight / norm(modelRight);
-
-    glm::mat4 rotationMatrix = glm::lookAt(glm::vec3(0), glm::vec3(modelRight.x, modelRight.y, modelRight.z), glm::vec3(modelUp.x, modelUp.y, modelUp.z));
-
-    glm::mat4 modelMatrix = Matrix_Translate(modelPosition.x, modelPosition.y - 0.1, modelPosition.z)
-                            * glm::inverse(rotationMatrix)
-                            * Matrix_Scale(0.04f, 0.04f, 0.04f);
-
-    swordModel.modelMatrix = modelMatrix;
+    if(!maze->checkCollision(newCameraPosition, 0.5f)) {
+        position = newCameraPosition;
+        freeCamera->position = newCameraPosition;
+    }
 }

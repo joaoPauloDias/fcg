@@ -1,4 +1,5 @@
 #include "VirtualScene.h"
+#include "GameObject.h"
 
 void VirtualScene::RenderScene() {
     for (auto &&[name, object]: objects) {
@@ -14,6 +15,7 @@ void VirtualScene::UpdateScene(float dt) {
 
 void VirtualScene::AddObject(std::string name, GameObject *object) {
     objects[name] = object;
+    object->SetVirtualScene(this);
 }
 
 GameObject *VirtualScene::GetObject(std::string name) {

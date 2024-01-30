@@ -8,6 +8,7 @@
 #include "matrices.h"
 #include "globals.h"
 
+
 int numObjects = 0;
 
 ObjModel::ObjModel(const char* filename, const char* basepath, bool triangulate) {

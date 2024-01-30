@@ -19,6 +19,7 @@ struct FreeCamera {
     float phi;
     float speed;
     glm::vec4 position;
+    glm::vec4 view_vector;
 
     bool wPressed = false;
     bool sPressed = false;
@@ -26,9 +27,9 @@ struct FreeCamera {
     bool dPressed = false;
 
     FreeCamera(float theta, float phi, glm::vec4 position, float speed=0.5f);
+    void update(float dt);
     void handleScroll(double xoffset, double yoffset);
     void handleCursor(double dx, double dy);
     void handleKey(int key, int scancode, int action, int mod);
-    void update(glm::vec4 new_position);
     glm::vec4 getNewPosition(float dt);
 };
