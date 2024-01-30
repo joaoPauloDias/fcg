@@ -70,8 +70,6 @@ GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
 
-// Abaixo definimos variáveis globais utilizadas em várias funções do código.
-
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
 void PushMatrix(glm::mat4 M);

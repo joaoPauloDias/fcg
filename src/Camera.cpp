@@ -94,8 +94,8 @@ glm::vec4 FreeCamera::getNewPosition(float dt) {
     glm::vec4 camera_view_vector = glm::vec4(x, FREE ? y : .0f, z, 0.0f); // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
 
-    glm::vec4 w = -camera_view_vector/norm(camera_view_vector);
-    glm::vec4 u = crossproduct(camera_up_vector, w);
+    w = -camera_view_vector/norm(camera_view_vector);
+    u = crossproduct(camera_up_vector, w);
     glm::vec4 new_position = position;
 
     if (wPressed) {

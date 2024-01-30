@@ -79,6 +79,7 @@ namespace engine
         // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
         glfwMakeContextCurrent(window);
 
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
         // biblioteca GLAD.
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -199,35 +200,13 @@ namespace engine
         // parâmetros que definem a posição da câmera dentro da cena virtual.
         // Assim, temos que o usuário consegue controlar a câmera.
 
-        if (g_LeftMouseButtonPressed)
-        {
-            // Deslocamento do cursor do mouse em x e y de coordenadas de tela!
-            float dx = xpos - g_LastCursorPosX;
-            float dy = ypos - g_LastCursorPosY;
+        float dx = xpos - g_LastCursorPosX;
+        float dy = ypos - g_LastCursorPosY;
 
-            camera.handleCursor(dx, dy);
+        camera.handleCursor(dx, dy);
 
-            // Atualizamos as variáveis globais para armazenar a posição atual do
-            // cursor como sendo a última posição conhecida do cursor.
-            g_LastCursorPosX = xpos;
-            g_LastCursorPosY = ypos;
-        }
-
-        if (g_RightMouseButtonPressed)
-        {
-            // Atualizamos as variáveis globais para armazenar a posição atual do
-            // cursor como sendo a última posição conhecida do cursor.
-            g_LastCursorPosX = xpos;
-            g_LastCursorPosY = ypos;
-        }
-
-        if (g_MiddleMouseButtonPressed)
-        {
-            // Atualizamos as variáveis globais para armazenar a posição atual do
-            // cursor como sendo a última posição conhecida do cursor.
-            g_LastCursorPosX = xpos;
-            g_LastCursorPosY = ypos;
-        }
+        g_LastCursorPosX = xpos;
+        g_LastCursorPosY = ypos;
     }
 
     // Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.

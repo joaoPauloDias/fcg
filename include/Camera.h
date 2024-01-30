@@ -20,6 +20,8 @@ struct FreeCamera {
     float speed;
     glm::vec4 position;
     glm::vec4 view_vector;
+    glm::vec4 u;
+    glm::vec4 w;
 
     bool wPressed = false;
     bool sPressed = false;
