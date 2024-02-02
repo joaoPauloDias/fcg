@@ -21,6 +21,7 @@ set(SOURCES
   src/Theseus.cpp
   src/collisions.cpp
   src/GameObject.cpp
+  src/BezierCurve.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
