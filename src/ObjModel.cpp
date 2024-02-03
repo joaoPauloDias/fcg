@@ -131,8 +131,6 @@ void ObjModel::BuildTriangles() {
     std::vector<float>  model_coefficients;
     std::vector<float>  normal_coefficients;
     std::vector<float>  texture_coefficients;
-    std::vector<float>  tangent_coefficients;
-    std::vector<float>  bitangent_coefficients;
 
     for (size_t shape = 0; shape < shapes.size(); ++shape)
     {
@@ -195,65 +193,6 @@ void ObjModel::BuildTriangles() {
                     texture_coefficients.push_back( v );
                 }
             }
-
-            glm::vec4 v1 = glm::vec4(
-                model_coefficients[triangle * 3 * 4 + 0],
-                model_coefficients[triangle * 3 * 4 + 1],
-                model_coefficients[triangle * 3 * 4 + 2],
-                model_coefficients[triangle * 3 * 4 + 3]
-            );
-            glm::vec4 v2 = glm::vec4(
-                model_coefficients[triangle * 3 * 4 + 4],
-                model_coefficients[triangle * 3 * 4 + 5],
-                model_coefficients[triangle * 3 * 4 + 6],
-                model_coefficients[triangle * 3 * 4 + 7]
-            );
-            glm::vec4 v3 = glm::vec4(
-                model_coefficients[triangle * 3 * 4 + 8],
-                model_coefficients[triangle * 3 * 4 + 9],
-                model_coefficients[triangle * 3 * 4 + 10],
-                model_coefficients[triangle * 3 * 4 + 11]
-            );
-            glm::vec2 uv1 = glm::vec2(
-                texture_coefficients[triangle * 3 * 2 + 0],
-                texture_coefficients[triangle * 3 * 2 + 1]
-            );
-            glm::vec2 uv2 = glm::vec2(
-                texture_coefficients[triangle * 3 * 2 + 1],
-                texture_coefficients[triangle * 3 * 2 + 2]
-            );
-            glm::vec2 uv3 = glm::vec2(
-                texture_coefficients[triangle * 3 * 2 + 3],
-                texture_coefficients[triangle * 3 * 2 + 4]
-            );
-
-            glm::vec4 edge1 = v2 - v1;
-            glm::vec4 edge2 = v3 - v1;
-            glm::vec2 deltaUV1 = uv2 - uv1;
-            glm::vec2 deltaUV2 = uv3 - uv1;
-
-            float f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-            glm::vec3 tangent = glm::vec3(
-                f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x),
-                f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y),
-                f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z)
-            );
-            glm::vec3 bitangent = glm::vec3(
-                f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x),
-                f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y),
-                f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z)
-            );
-            for (size_t vertex = 0; vertex < 3; ++vertex) {
-                tangent_coefficients.push_back(tangent.x);
-                tangent_coefficients.push_back(tangent.y);
-                tangent_coefficients.push_back(tangent.z);
-                tangent_coefficients.push_back(0.0f);
-
-                bitangent_coefficients.push_back(bitangent.x);
-                bitangent_coefficients.push_back(bitangent.y);
-                bitangent_coefficients.push_back(bitangent.z);
-                bitangent_coefficients.push_back(0.0f);
-            }
         }
 
         size_t last_index = indices.size() - 1;
@@ -307,34 +246,6 @@ void ObjModel::BuildTriangles() {
         glBufferSubData(GL_ARRAY_BUFFER, 0, texture_coefficients.size() * sizeof(float), texture_coefficients.data());
         location = 2; // "(location = 1)" em "shader_vertex.glsl"
         number_of_dimensions = 2; // vec2 em "shader_vertex.glsl"
-        glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(location);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    if ( !tangent_coefficients.empty() )
-    {
-        GLuint VBO_tangent_coefficients_id;
-        glGenBuffers(1, &VBO_tangent_coefficients_id);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_tangent_coefficients_id);
-        glBufferData(GL_ARRAY_BUFFER, texture_coefficients.size() * sizeof(float), NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, texture_coefficients.size() * sizeof(float), texture_coefficients.data());
-        location = 3; // "(location = 1)" em "shader_vertex.glsl"
-        number_of_dimensions = 4; // vec2 em "shader_vertex.glsl"
-        glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
-        glEnableVertexAttribArray(location);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-
-    if ( !bitangent_coefficients.empty() )
-    {
-        GLuint VBO_bitangent_coefficients_id;
-        glGenBuffers(1, &VBO_bitangent_coefficients_id);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO_bitangent_coefficients_id);
-        glBufferData(GL_ARRAY_BUFFER, texture_coefficients.size() * sizeof(float), NULL, GL_STATIC_DRAW);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, texture_coefficients.size() * sizeof(float), texture_coefficients.data());
-        location = 4; // "(location = 1)" em "shader_vertex.glsl"
-        number_of_dimensions = 4; // vec2 em "shader_vertex.glsl"
         glVertexAttribPointer(location, number_of_dimensions, GL_FLOAT, GL_FALSE, 0, 0);
         glEnableVertexAttribArray(location);
         glBindBuffer(GL_ARRAY_BUFFER, 0);

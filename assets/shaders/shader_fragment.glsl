@@ -26,6 +26,7 @@ in vec3 gouraud_diffuse;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform int object_id;
 
 #define DIFFUSE 0
 #define BLINN_PHONG 1
@@ -35,7 +36,6 @@ uniform mat4 projection;
 
 uniform int illumination;
 uniform int interpolation;
-
 
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
@@ -158,7 +158,20 @@ vec3 diffuse_phong() {
 
 void main()
 {
-    if (interpolation == PHONG) {
+    // Special case for SkyBox
+    if (object_id == 0) {
+        vec4 bbox_center = (bbox_min + bbox_max) / 2.0;
+
+        vec4 p_ = normalize(position_model - bbox_center);
+        float theta = atan(p_.x, p_.z);
+        float phi = asin(p_.y);
+
+        float U = (theta + M_PI)/(2 * M_PI);
+        float V = (phi + M_PI_2)/M_PI;
+
+        vec3 Kd = texture(TextureDiffuse, vec2(U,V)).rgb;
+        color.rgb = Kd;
+    } else if (interpolation == PHONG) {
         if (illumination == DIFFUSE) {
             color.rgb = diffuse_phong();
         } else if (illumination == BLINN_PHONG) {

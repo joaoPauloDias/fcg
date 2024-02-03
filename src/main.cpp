@@ -58,6 +58,7 @@
 #include "Maze.h"
 #include "Theseus.h"
 #include "Minotaur.h"
+#include "SkyBox.h"
 
 #include "VirtualScene.h"
 
@@ -128,6 +129,9 @@ int main(int argc, char *argv[])
     }
 
     VirtualScene scene;
+
+    skybox::SkyBox mySkyBox(textureLoader, &camera);
+    scene.AddObject("skybox", &mySkyBox);
 
     maze::Maze myMaze(textureLoader, 11);
     scene.AddObject("maze", &myMaze);

@@ -26,6 +26,12 @@ diffuse = "../../assets/textures/texture_ground.jpg"
 [textures.sword]
 diffuse = "../../assets/textures/Sword_texture.png"
 
+[textures.skybox]
+diffuse = "../../assets/textures/skybox.jpg"
+
+[textures.wings]
+diffuse = "../../assets/textures/wings.png"
+
 [shaders]
 vertex = "../../assets/shaders/shader_vertex.glsl"
 fragment = "../../assets/shaders/shader_fragment.glsl"

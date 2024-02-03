@@ -22,6 +22,8 @@ set(SOURCES
   src/collisions.cpp
   src/GameObject.cpp
   src/BezierCurve.cpp
+  src/Minotaur.cpp
+  src/SkyBox.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
