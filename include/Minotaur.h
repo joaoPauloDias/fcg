@@ -16,6 +16,7 @@ namespace minotaur {
         public:
             Minotaur(texture::TextureLoader textureLoader, glm::vec4 position);
             Cylinder getHitbox();
+            std::pair<int, int> GetNextPosition();
             void ReceiveHit(int damage);
             void Render();
             void Update(float dt);
