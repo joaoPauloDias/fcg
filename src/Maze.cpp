@@ -1,8 +1,11 @@
 #include "Maze.h"
 #include <iostream>
 #include <algorithm>
+#include <cmath>
 #include "collisions.h"
 #include "globals.h"
+#include "Theseus.h"
+
 
 using namespace maze;
 
@@ -99,7 +102,15 @@ void Maze::Render() {
 }
 
 void Maze::Update(float dt) {
+    theseus::Theseus* theseus =  dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"));
+    getMazeIndex(theseus->getPosition());
     //std::cout << "Updating maze\n";
+}
+
+std::pair<int, int> Maze::getMazeIndex(glm::vec4 position){
+    int i = std::round(position.x / 2.0f);
+    int j = std::round(position.z / 2.0f);
+    return {i, j};
 }
 
 bool Maze::checkCollision(glm::vec4 position, float radius) {

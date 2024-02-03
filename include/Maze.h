@@ -16,16 +16,20 @@ namespace maze{
         std::vector<std::pair<bool, glm::mat4>> blockMatrices_;
         std::vector<std::vector<bool>> walls_;
         std::mt19937 randomGenerator_;
-        int size_;
         ObjModel wallModel;
         ObjModel groundModel;
     public:
+        int size_;
         Maze(texture::TextureLoader textureLoader, int n);
         void generateDisplay();
         void generateBlocks();
         void display() const;
+        std::pair<int, int> getMazeIndex(glm::vec4 position);
         const std::vector<std::pair<bool, glm::mat4>>& getBlockMatrices() const {
             return blockMatrices_;
+        }
+        const  std::vector<std::vector<bool>>& getWalls() const {
+            return walls_;
         }
         const ObjModel& getModel() const {
             return wallModel;
