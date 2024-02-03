@@ -57,6 +57,7 @@
 #include "TextureLoader.h"
 #include "Maze.h"
 #include "Theseus.h"
+#include "Minotaur.h"
 
 #include "VirtualScene.h"
 
@@ -134,6 +135,9 @@ int main(int argc, char *argv[])
     theseus::Theseus myTheseus(textureLoader, &camera);
     scene.AddObject("theseus", &myTheseus);
 
+    minotaur::Minotaur myMinotaur(textureLoader, glm::vec4(2.0f, -1.0f, 2.0f, 1.0f));
+    scene.AddObject("minotaur", &myMinotaur);
+
     engine::SetActiveScene(&scene);
 
     engine::Run(window);
@@ -162,14 +166,11 @@ void PopMatrix(glm::mat4 &M)
     }
 }
 
-// Função que carrega os shaders de vértices e de fragmentos que serão
-// utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
-//
-void LoadShadersFromFiles()
+void LoadShadersFromFiles(std::string vertex_shader, std::string fragmentShader)
 {
 
-    GLuint vertex_shader_id = LoadShader_Vertex("../../assets/shaders/shader_vertex.glsl");
-    GLuint fragment_shader_id = LoadShader_Fragment("../../assets/shaders/shader_fragment.glsl");
+    GLuint vertex_shader_id = LoadShader_Vertex(vertex_shader.c_str());
+    GLuint fragment_shader_id = LoadShader_Fragment(fragmentShader.c_str());
 
     // Deletamos o programa de GPU anterior, caso ele exista.
     if (g_GpuProgramID != 0)
@@ -191,6 +192,13 @@ void LoadShadersFromFiles()
     // Variáveis em "shader_fragment.glsl" para acesso das imagens de textura
     glUseProgram(g_GpuProgramID);
     glUseProgram(0);
+}
+
+// Função que carrega os shaders de vértices e de fragmentos que serão
+// utilizados para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
+//
+void LoadShadersFromFiles() {
+    LoadShadersFromFiles("../../assets/shaders/shader_vertex.glsl", "../../assets/shaders/shader_fragment.glsl");
 }
 
 // Carrega um Vertex Shader de um arquivo GLSL. Veja definição de LoadShader() abaixo.

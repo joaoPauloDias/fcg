@@ -5,6 +5,8 @@
 layout (location = 0) in vec4 model_coefficients;
 layout (location = 1) in vec4 normal_coefficients;
 layout (location = 2) in vec2 texture_coefficients;
+layout (location = 3) in vec4 tangent_coefficients;
+layout (location = 4) in vec4 bitangent_coefficients;
 
 // Matrizes computadas no código C++ e enviadas para a GPU
 uniform mat4 model;
@@ -19,6 +21,18 @@ out vec4 position_world;
 out vec4 position_model;
 out vec4 normal;
 out vec2 texcoords;
+
+
+out vec3 gouraud;
+
+#define DIFFUSE 0
+#define BLINN_PHONG 1
+
+#define PHONG 0
+#define GOURAUD 1
+
+uniform int illumination;
+uniform int interpolation;
 
 void main()
 {
@@ -50,7 +64,7 @@ void main()
     // Agora definimos outros atributos dos vértices que serão interpolados pelo
     // rasterizador para gerar atributos únicos para cada fragmento gerado.
 
-    // Posição do vértice atual no sistema de coordenadas global (World).
+    // Posição do vérticespecular_gouraud atual no sistema de coordenadas global (World).
     position_world = model * model_coefficients;
 
     // Posição do vértice atual no sistema de coordenadas local do modelo.
@@ -63,5 +77,20 @@ void main()
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
     texcoords = texture_coefficients;
-}
 
+    if (interpolation == GOURAUD) {
+        vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
+        vec4 camera_position = inverse(view) * origin;
+        vec4 p = position_world;
+        vec4 l = normalize(vec4(1.0,1.0,0.0,0.0));
+        vec4 v = normalize(camera_position - p);
+        vec4 r = normalize(-l + 2 * normal * dot(normal, l));
+        float lambert = max(0,dot(normal,l));
+        float specular = pow(max(0, dot(r, v)), 40);
+
+        gouraud = vec3(1, 1, 1) * (lambert + 0.1);
+        if (illumination == BLINN_PHONG) {
+            gouraud = gouraud + vec3(0.8, 0.8, 0.8) * specular;
+        }
+    }
+}

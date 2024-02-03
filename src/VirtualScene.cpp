@@ -19,6 +19,12 @@ void VirtualScene::AddObject(std::string name, GameObject *object) {
 }
 
 GameObject *VirtualScene::GetObject(std::string name) {
-    return objects[name];
+    if (objects.find(name) != objects.end()) {
+        return objects[name];
+    }
+    return nullptr;
 }
 
+void VirtualScene::RemoveObject(std::string name) {
+    objects.erase(name);
+}

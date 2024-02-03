@@ -11,19 +11,23 @@
 
 
 namespace theseus{
-    class Theseus : public GameObject {
-    private:
-        ObjModel swordModel;
-        FreeCamera* freeCamera;
-        glm::vec4 position;
-        glm::mat4 modelMatrix;
+class Theseus : public GameObject {
+private:
+    ObjModel swordModel;
+    FreeCamera* freeCamera;
+    glm::vec4 position;
+    glm::mat4 modelMatrix;
 
-        int attackStatus = ATTACK_AVAILABLE;
-        float attackTime = 0.0f;
-        
-    public:
-        Theseus(texture::TextureLoader textureLoader, FreeCamera* camera);
-        void Render();
-        void Update(float dt);
-    };
-}
+    int attackStatus = ATTACK_AVAILABLE;
+    float attackTime = 0.0f;
+    bool inflictedDamage = false;
+
+public:
+    Theseus(texture::TextureLoader textureLoader, FreeCamera* camera);
+    void Render();
+    void Update(float dt);
+    void AttackAvailable();
+    void AttackCooldown(float dt, float& t);
+    void AttackActive(float dt, float& t);
+};
+}  // namespace theseus

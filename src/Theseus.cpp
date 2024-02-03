@@ -1,6 +1,7 @@
 #include "Theseus.h"
 
 #include "Maze.h"
+#include "Minotaur.h"
 #include "matrices.h"
 #include "globals.h"
 
@@ -19,50 +20,33 @@ extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed;
 
 Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
-    :
-      swordModel("../../assets/models/sword.obj"), freeCamera(camera)
+    : swordModel("../../assets/models/sword.obj"), freeCamera(camera)
 {
-    swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_normals"),NULL,NULL);
+    swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
 }
 
 
 void Theseus::Render() {
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), 1);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_PHONG);
     swordModel.ApplyModelMatrix(modelMatrix);
     swordModel.Draw();
 }
 
 void Theseus::Update(float dt) {
-    float t;
+    float t = 0;
     switch (attackStatus) {
         case ATTACK_AVAILABLE:
-            if (g_LeftMouseButtonPressed) {
-                attackTime = 0;
-                attackStatus = ATTACK_ACTIVE;
-            }
+            AttackAvailable();
             break;
 
         case ATTACK_ACTIVE:
-            attackTime += dt;
-
-            t = attackTime / ATTACK_ACTIVE_DURATION;
-
-            if (attackTime >= ATTACK_ACTIVE_DURATION) {
-                attackTime = ATTACK_COOLDOWN_DURATION;
-                attackStatus = ATTACK_IN_COOLDOWN;
-            }
+            AttackActive(dt, t);
             break;
         
         case ATTACK_IN_COOLDOWN:
-            attackTime -= dt;
-
-            t = attackTime / ATTACK_COOLDOWN_DURATION;
-
-            if (attackTime <= 0) {
-                attackTime = 0;
-                attackStatus = ATTACK_AVAILABLE;
-            }
+            AttackCooldown(dt, t);
             break;
         default:
             break;
@@ -72,7 +56,7 @@ void Theseus::Update(float dt) {
     // to draw the sword in the correct position
     glm::vec4 swordPosition = 
         position + 
-        freeCamera->view_vector * 0.2f + 
+        freeCamera->view_vector * (0.2f + 0.15f*t)+ 
         freeCamera->u * 0.1f + 
         glm::vec4(0.0f, -0.1f, 0.0f, 0.0f);
 
@@ -83,13 +67,54 @@ void Theseus::Update(float dt) {
         Matrix_Rotate_Z(M_PI_2 * t) *
         Matrix_Rotate_X(SWORD_X_ANGLE) *
         Matrix_Scale(SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR);
-
-    glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt);
     
-    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
+    
+    minotaur::Minotaur* minotaur = (minotaur::Minotaur*) GetVirtualScene()->GetObject("minotaur");
+    if (minotaur != nullptr) {
+        float swordLength = swordModel.GetPart("sword")->bbox_max.y;
+        glm::vec4 swordTip = modelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
 
+        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && checkCollision(minotaur->getHitbox(), swordTip)) {
+            minotaur->ReceiveHit(1);
+            inflictedDamage = true;
+        }
+    }
+
+    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
+    glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt);
     if(!maze->checkCollision(newCameraPosition, CAMERA_RADIUS)) {
         position = newCameraPosition;
         freeCamera->position = newCameraPosition;
+    }
+}
+
+void Theseus::AttackAvailable() {
+    if (g_LeftMouseButtonPressed) {
+        attackTime = 0;
+        attackStatus = ATTACK_ACTIVE;
+    }
+}
+
+void theseus::Theseus::AttackActive(float dt, float& t) {
+    attackTime += dt;
+
+    t = attackTime / ATTACK_ACTIVE_DURATION;
+
+    if (attackTime >= ATTACK_ACTIVE_DURATION) {
+        attackTime = ATTACK_COOLDOWN_DURATION;
+        attackStatus = ATTACK_IN_COOLDOWN;
+    }
+}
+
+
+void theseus::Theseus::AttackCooldown(float dt, float& t) {
+    attackTime -= dt;
+
+    t = attackTime / ATTACK_COOLDOWN_DURATION;
+
+    if (attackTime <= 0) {
+        attackTime = 0;
+        attackStatus = ATTACK_AVAILABLE;
+        inflictedDamage = false;
     }
 }

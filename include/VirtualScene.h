@@ -14,4 +14,5 @@ class VirtualScene {
         void UpdateScene(float dt);
         void AddObject(std::string name, GameObject *object);
         GameObject* GetObject(std::string name);
+        void RemoveObject(std::string name);
 };

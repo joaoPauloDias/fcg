@@ -13,17 +13,30 @@ in vec4 position_model;
 // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
 in vec2 texcoords;
 
+in float lambert_gouraud;
+in float specular_gouraud;
+in vec4 r_gouraud;
+in vec4 v_gouraud;
+in vec3 gouraud;
+in vec3 gouraud_ambient;
+in vec3 gouraud_specular;
+in vec3 gouraud_diffuse;
+
 // Matrizes computadas no código C++ e enviadas para a GPU
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// Identificador que define qual objeto está sendo desenhado no momento
 #define DIFFUSE 0
 #define BLINN_PHONG 1
 
-uniform int object_id;
+#define PHONG 0
+#define GOURAUD 1
+
 uniform int illumination;
+uniform int interpolation;
+
+
 
 // Parâmetros da axis-aligned bounding box (AABB) do modelo
 uniform vec4 bbox_min;
@@ -45,7 +58,7 @@ out vec4 color;
 #define M_PI   3.14159265358979323846
 #define M_PI_2 1.57079632679489661923
 
-vec3 blinn_phong() {
+vec3 blinn_phong_phong() {
     // Obtemos a posição da câmera utilizando a inversa da matriz que define o
     // sistema de coordenadas da câmera.
     vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
@@ -66,13 +79,8 @@ vec3 blinn_phong() {
     U = texcoords.x;
     V = texcoords.y;
 
-    vec4 n;
-    if (useNormalsTexture) {
-        n = normalize(texture(TextureNormals, vec2(U,V)).rgba);
-    } else {
-        n = normalize(normal);
-    }
-    
+    vec4 n = normalize(normal);
+
     // Normal do fragmento atual, interpolada pelo rasterizador a partir das
     // normais de cada vértice.
 
@@ -87,26 +95,23 @@ vec3 blinn_phong() {
 
     // Obtemos a refletância difusa a partir da leitura da imagem TextureImage0
     vec3 Kd;
-    if (useDiffuseTexture) {
-        Kd = texture(TextureDiffuse, vec2(U,V)).rgb;
-    } else {
-        Kd = vec3(1.0, 1.0, 1.0);
-    }
+    Kd = texture(TextureDiffuse, vec2(U,V)).rgb;
+
     vec3 Ks;
     if (useSpecularTexture) {
         Ks = texture(TextureSpecular, vec2(U,V)).rgb;
     } else {
-        Ks = vec3(0, 0, 0);
+        Ks = vec3(0.4, 0.4, 0.4);
     }
-    
+
     // Equação de Iluminação
     float lambert = max(0,dot(n,l));
     float q = 40;
 
-    return Kd * lambert + Ks * pow(max(0, dot(r, v)), 40) + Kd * 0.3 * lambert;
+    return Kd * lambert + Ks * pow(max(0, dot(r, v)), 40) + Kd * 0.3;
 }
 
-vec3 diffuse() {
+vec3 diffuse_phong() {
     // Obtemos a posição da câmera utilizando a inversa da matriz que define o
     // sistema de coordenadas da câmera.
     vec4 origin = vec4(0.0, 0.0, 0.0, 1.0);
@@ -120,12 +125,8 @@ vec3 diffuse() {
     vec4 p = position_world;
 
     // Coordenadas de textura U e V
-    float U = 0.0;
-    float V = 0.0;
-
-    // Coordenadas de textura do plano, obtidas do arquivo OBJ.
-    U = texcoords.x;
-    V = texcoords.y;
+    float U = texcoords.x;
+    float V = texcoords.y;
 
     vec4 n;
     if (useNormalsTexture) {
@@ -154,12 +155,20 @@ vec3 diffuse() {
     return Kd * (lambert + 0.3);
 }
 
+
 void main()
 {
-    if (illumination == DIFFUSE) {
-        color.rgb = diffuse();
-    } else if (illumination == BLINN_PHONG) {
-        color.rgb = blinn_phong();
+    if (interpolation == PHONG) {
+        if (illumination == DIFFUSE) {
+            color.rgb = diffuse_phong();
+        } else if (illumination == BLINN_PHONG) {
+            color.rgb = blinn_phong_phong();
+        }
+    } else if (interpolation == GOURAUD) {
+        float U = texcoords.x;
+        float V = texcoords.y;
+        vec3 Kd = texture(TextureDiffuse, vec2(U,V)).rgb;
+        color.rgb = Kd * gouraud;
     }
     color.a = 1;
     color.rgb = pow(color.rgb, vec3(1.0,1.0,1.0)/2.2);

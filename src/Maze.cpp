@@ -6,14 +6,24 @@
 
 using namespace maze;
 
+void LoadShadersFromFiles();
+void LoadShadersFromFiles(std::string vertex_shader, std::string fragmentShader);
 
 Maze::Maze(texture::TextureLoader textureLoader, int n)
     : size_(n), randomGenerator_(std::random_device{}()), 
       wallModel("../../assets/models/wall.obj"), 
       groundModel("../../assets/models/ground.obj")
 {
-    wallModel.GetPart("Wall")->setTextures(textureLoader.GetTexture("wall_normals"), NULL, NULL);
-    groundModel.GetPart("Ground")->setTextures(textureLoader.GetTexture("ground_normals"), NULL, NULL);
+    wallModel.GetPart("Wall")->setTextures(
+        textureLoader.GetTexture("wall_diffuse"), 
+        textureLoader.GetTexture("wall_specular"), 
+        textureLoader.GetTexture("wall_normals")
+    );
+    groundModel.GetPart("Ground")->setTextures(
+        textureLoader.GetTexture("ground_diffuse"),
+        textureLoader.GetTexture("ground_specular"),
+        textureLoader.GetTexture("ground_normals")
+    );
 
     walls_ = std::vector<std::vector<bool>>(size_, std::vector<bool>(size_, true));
     generateDisplay();
@@ -74,7 +84,9 @@ void Maze::generateBlocks()
 }
 
 void Maze::Render() {
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), 0);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_GOURAUD);
+
     for (auto &&[isWall, m] : getBlockMatrices()) {
         if (isWall) {
             wallModel.ApplyModelMatrix(m);

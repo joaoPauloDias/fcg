@@ -24,3 +24,11 @@ bool cubeSphereCollision(
     // Check if the distance is less than or equal to the radius
     return distanceSquared <= (radius * radius);
 }
+
+bool checkCollision(Cylinder cylinder, glm::vec4 point) {
+    float minCylinderHeight = cylinder.center.y - cylinder.height/2;
+    float maxCylinderHeight = cylinder.center.y + cylinder.height/2;
+    float distanceFromAxis = pow(cylinder.center.x - point.x, 2) + pow(cylinder.center.z - point.z, 2);
+
+    return minCylinderHeight <= point.y && point.y <= maxCylinderHeight && distanceFromAxis <= (cylinder.radius * cylinder.radius);
+}

@@ -16,14 +16,15 @@ normals = "../../assets/textures/Pants_normals.tga"
 specular = "../../assets/textures/Pants_specular.tga"
 
 [textures.wall]
-normals = "../../assets/textures/texture_wall.jpg"
+diffuse = "../../assets/textures/texture_wall.jpg"
+#normals = "../../assets/textures/brick-norm.tga"
+#specular = "../../assets/textures/brick-spec.tga"
 
 [textures.ground]
-normals = "../../assets/textures/texture_ground.jpg"
+diffuse = "../../assets/textures/texture_ground.jpg"
 
 [textures.sword]
-normals = "../../assets/textures/Sword_texture.png"
-
+diffuse = "../../assets/textures/Sword_texture.png"
 
 [shaders]
 vertex = "../../assets/shaders/shader_vertex.glsl"
