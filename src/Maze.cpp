@@ -84,7 +84,7 @@ void Maze::generateBlocks()
 }
 
 void Maze::Render() {
-    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_DIFFUSE);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_GOURAUD);
 
     for (auto &&[isWall, m] : getBlockMatrices()) {
