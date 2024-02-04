@@ -26,13 +26,14 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
     model.GetPart("Body_teeth")->setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
 
     model.GetPart("Body_eyes")->setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
+
+    hitBox.height = 1.8f;
+    hitBox.radius = 0.6f;
 }
 
 Cylinder Minotaur::getHitbox()
 {
     hitBox.center = this->position + glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
-    hitBox.height = 1.8f;
-    hitBox.radius = 0.4f;
     return hitBox;
 }
 
@@ -45,19 +46,21 @@ void Minotaur::Update(float dt)
         GetVirtualScene()->RemoveObject("minotaur");
     }
 
-    //maze::Maze* maze GetVirtualScene()->GetObject("maze")
-    float grid_x = position.x / 2.0f;
-    float grid_z = position.z / 2.0f;
-    bool int_x = abs(grid_x - round(grid_x)) <= 1e-5;
-    bool int_z = abs(grid_z - round(grid_z)) <= 1e-5;
+    float pos_x = position.x / 2.0f;
+    float pos_z = position.z / 2.0f;
+    int grid_x = std::round(pos_x);
+    int grid_z = std::round(pos_z);
 
-    //printf("%.2f, %.2f, %.2f, %.2f\n", grid_x, grid_z, round(grid_x), round(grid_z));
-    auto [i,j] = GetNextPosition();
+    // Warning: Must use an abs function that supports floating point numbers
+    bool center_x = std::abs(pos_x - grid_x) <= 1e-2;
+    bool center_z = std::abs(pos_z - grid_z) <= 1e-2;
 
-    position.x += i;
-    position.z += j;
-    // position.x += nextDirection.first*dt;
-    // position.z += nextDirection.second*dt;
+    if (center_x && center_z) {
+        nextDirection = GetNextPosition();
+    }
+
+    position.x += nextDirection.first*dt;
+    position.z += nextDirection.second*dt;
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
