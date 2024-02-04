@@ -45,13 +45,13 @@ void Minotaur::Update(float dt)
         GetVirtualScene()->RemoveObject("minotaur");
     }
 
-    glm::vec4 gridPosition = position / 2.0f;
-
-    if (abs(gridPosition.x - round(gridPosition.x)) <= 1e-5 && abs(gridPosition.z - round(gridPosition.z)) <= 1e-5) {
+    bool int_x = abs(position.x - int(position.x)) <= 1e-5;
+    bool int_z = abs(position.z - int(position.z)) <= 1e-5;
+    bool even_x = int(position.x) % 2 == 0;
+    bool even_z = int(position.z) % 2 == 0;
+    if (int_x && int_z && even_x && even_z) {
         nextDirection = GetNextPosition();
     }
-
-    PrintVector(position);
 
     position.x += nextDirection.first*dt;
     position.z += nextDirection.second*dt;
