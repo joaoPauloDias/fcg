@@ -5,6 +5,7 @@
 #include "matrices.h"
 #include "globals.h"
 
+
 #include "GLFW/glfw3.h"
 
 #define ATTACK_ACTIVE_DURATION 0.3
@@ -12,6 +13,7 @@
 
 #define CAMERA_RADIUS 0.5f
 #define SWORD_SCALE_FACTOR 0.04f
+#define SHIELD_SCALE_FACTOR 0.07f
 #define SWORD_X_ANGLE (-M_PI_2 / 9)
 
 using namespace theseus;
@@ -19,6 +21,11 @@ using namespace theseus;
 extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed;
 extern bool FREE;
+extern bool wPressed;
+extern bool sPressed;
+extern bool aPressed;
+extern bool dPressed;
+
 
 Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     : swordModel("../../assets/models/sword.obj"), 
@@ -27,8 +34,8 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
 
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
-    swordModel.GetPart("Shield_Sphere.001")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
-    position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
+    shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
+    position = glm::vec4(4.0f, 0.5f, 2.0f, 1.0f);
     hitBox.center = position;
     hitBox.radius = CAMERA_RADIUS;
 }
@@ -47,6 +54,8 @@ void Theseus::Render() {
 }
 
 void Theseus::Update(float dt) {
+    hitBox.center = position;
+
     float t = 0;
     switch (attackStatus) {
         case ATTACK_AVAILABLE:
@@ -82,37 +91,16 @@ void Theseus::Update(float dt) {
     
     glm::vec4 shieldPosition = 
         position + 
-        freeCamera->view_vector * (0.2f + 0.15f*t)- 
+        freeCamera->view_vector * 0.2f - 
         freeCamera->u * 0.1f + 
         glm::vec4(0.0f, -0.1f, 0.0f, 0.0f);
     shieldModelMatrix = 
         Matrix_Translate(shieldPosition.x, shieldPosition.y, shieldPosition.z) *
-        Matrix_Rotate_Y(freeCamera->theta) * 
-        Matrix_Scale(SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR);
+        Matrix_Rotate_Y(freeCamera->theta + M_PI + 0.12f) * 
+        Matrix_Scale(SHIELD_SCALE_FACTOR, SHIELD_SCALE_FACTOR, SHIELD_SCALE_FACTOR);
     
-    minotaur::Minotaur* minotaur = (minotaur::Minotaur*) GetVirtualScene()->GetObject("minotaur");
-    if (minotaur != nullptr) {
-        float swordLength = swordModel.GetPart("sword")->bbox_max.y;
-        glm::vec4 swordTip = swordModelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
-
-        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && collisions::checkCollision(minotaur->getHitbox(), swordTip)) {
-            minotaur->ReceiveHit(1);
-            inflictedDamage = true;
-        }
-    }
-
-    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
-
-    std::pair<bool, bool> dirs[] = {{true, true}, {true, false}, {false, true}};
-
-    for (auto [update_x, update_z] : dirs) {
-        hitBox.center = freeCamera->getNewPosition(dt, update_x, FREE, update_z);
-        if(!maze->checkCollision(hitBox)) {
-            position = hitBox.center;
-            freeCamera->position = hitBox.center;
-            break;
-        }
-    }
+    CheckMinotaurInteraction(dt);
+    HandlePlayerMovement(dt);
 }
 
 void Theseus::AttackAvailable() {
@@ -144,4 +132,93 @@ void theseus::Theseus::AttackCooldown(float dt, float& t) {
         attackStatus = ATTACK_AVAILABLE;
         inflictedDamage = false;
     }
+}
+
+void theseus::Theseus::CheckMinotaurInteraction(float dt) {
+    minotaur::Minotaur* minotaur = (minotaur::Minotaur*) GetVirtualScene()->GetObject("minotaur");
+
+    if (minotaur == nullptr)
+        return;
+
+    float swordLength = swordModel.GetPart("sword")->bbox_max.y;
+    glm::vec4 swordTip = swordModelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
+
+    collisions::Cylinder minotaurHitbox = minotaur->getHitbox();
+
+    if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && collisions::checkCollision(minotaurHitbox, swordTip)) {
+        minotaur->ReceiveHit(1);
+        inflictedDamage = true;
+    }
+
+    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
+
+    if (collisions::checkCollision(minotaurHitbox, getHitBox())) {
+        glm::vec4 knockbackDirection = (position - minotaurHitbox.center)/norm(position - minotaurHitbox.center);
+        knockbackDirection.y = 0;
+
+        SlideMovement(dt, [&](bool update_x, bool update_z, float dt) {
+            knockbackDirection.x = update_x;
+            knockbackDirection.z = update_z;
+            
+            return position + knockbackDirection * 1.0f * dt;
+        });
+    }
+}
+
+void theseus::Theseus::SlideMovement(float dt, std::function<glm::vec4(bool, bool, float)> func) {
+    std::pair<bool, bool> dirs[] = {{true, true}, {true, false}, {false, true}};
+    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
+
+    for (auto [update_x, update_z] : dirs) {
+        collisions::Sphere newHitbox = hitBox;
+
+        newHitbox.center = func(update_x, update_z, dt);
+
+        if (!maze->checkCollision(newHitbox)) {
+            position = newHitbox.center;
+            hitBox = newHitbox;
+            break;
+        }
+    }
+}
+
+
+void theseus::Theseus::HandlePlayerMovement(float dt) {
+    SlideMovement(dt, [this](bool update_x, bool update_z, float dt){
+        return getNewPosition(dt, update_x, FREE, update_z);
+    });
+    freeCamera->position = position;
+}
+
+glm::vec4 Theseus::getNewPosition(float dt, bool update_x, bool update_y, bool update_z) {
+    // Calculating position based on player movement
+    float y = sin(freeCamera->phi);
+    float z = cos(freeCamera->phi)*cos(freeCamera->theta);
+    float x = cos(freeCamera->phi)*sin(freeCamera->theta);
+
+    // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
+    // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
+    glm::vec4 camera_view_vector = glm::vec4(x, FREE ? y : .0f, z, 0.0f); // Vetor "view", sentido para onde a câmera está virada
+    glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+    freeCamera->w = -camera_view_vector/norm(camera_view_vector);
+    freeCamera->u = crossproduct(camera_up_vector, freeCamera->w);
+
+    glm::vec4 new_position = position;
+    glm::vec4 updateMask = glm::vec4(update_x, update_y, update_z, 1.0f);
+
+    if (wPressed) {
+        new_position -= freeCamera->w * freeCamera->speed * dt * updateMask;
+    }
+    if (sPressed) {
+        new_position += freeCamera->w * freeCamera->speed * dt * updateMask;
+    }
+    if (aPressed) {
+        new_position -= freeCamera->u * freeCamera->speed * dt * updateMask;
+    }
+    if (dPressed) {
+        new_position += freeCamera->u * freeCamera->speed * dt * updateMask;
+    }
+
+    return new_position;
 }

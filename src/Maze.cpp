@@ -123,10 +123,6 @@ bool Maze::checkCollision(const collisions::Sphere& sphere) {
             }
         }
         if (collision) {
-<<<<<<< Updated upstream
-=======
-            //std::cout<<"COLLISION\n";
->>>>>>> Stashed changes
             break;
         }
     }

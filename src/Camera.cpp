@@ -11,6 +11,10 @@
 extern float g_ScreenRatio;
 
 bool FREE = false;
+bool wPressed = false;
+bool sPressed = false;
+bool aPressed = false;
+bool dPressed = false;
 
 LookAtCamera::LookAtCamera(float t, float p, float d) {
     theta = t;

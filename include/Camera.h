@@ -23,11 +23,6 @@ struct FreeCamera {
     glm::vec4 u;
     glm::vec4 w;
 
-    bool wPressed = false;
-    bool sPressed = false;
-    bool aPressed = false;
-    bool dPressed = false;
-
     FreeCamera(float theta, float phi, glm::vec4 position, float speed=0.5f);
     void update(float dt);
     void handleScroll(double xoffset, double yoffset);

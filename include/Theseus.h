@@ -5,6 +5,7 @@
 #include "TextureLoader.h"
 #include "Camera.h"
 #include "collisions.h"
+#include <functional>
 
 #define ATTACK_AVAILABLE 0
 #define ATTACK_ACTIVE 1
@@ -43,5 +44,10 @@ namespace theseus
         void AttackAvailable();
         void AttackCooldown(float dt, float &t);
         void AttackActive(float dt, float &t);
+        void CheckMinotaurInteraction(float dt);
+        glm::vec4 getNewPosition(float dt, bool update_x, bool update_y,
+                                 bool update_z);
+        void HandlePlayerMovement(float dt);
+        void SlideMovement(float dt, std::function<glm::vec4(bool, bool, float)> func);
     };
-} // namespace theseus
+    }  // namespace theseus
