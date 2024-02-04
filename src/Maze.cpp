@@ -128,3 +128,14 @@ bool Maze::checkCollision(const collisions::Sphere& sphere) {
     }
     return collision;
 }
+
+std::pair<int, int> Maze::getRandomFreePosition(){
+    int i, j;
+    srand(time(nullptr));
+    do {
+        i = std::clamp(rand() % size_, 1, size_ - 2); 
+        j = std::clamp(rand() % size_, 1, size_ - 2); 
+    } while(walls_[i][j]);
+
+    return {i, j};
+}

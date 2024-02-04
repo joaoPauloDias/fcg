@@ -39,7 +39,7 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
-    position = glm::vec4(4.0f, 0.5f, 2.0f, 1.0f);
+    position = glm::vec4(2.0f, 0.5f, 2.0f, 1.0f);
     hitBox.center = position;
     hitBox.radius = CAMERA_RADIUS;
 }

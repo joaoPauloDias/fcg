@@ -21,6 +21,7 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
     this->textureLoader = textureLoader;
     health = 5;
     velocity = 2.0f;
+    randomGenerator_ = std::default_random_engine{};
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
@@ -168,14 +169,26 @@ std::pair<int, int> Minotaur::GetNextPosition()
 
     }
 
-    if(path.size()>1)atual = path[path.size()-2];
 
-    for (auto direction : directions)
-    {
-        if (minotaurPosition.first + di[direction] == atual.first && minotaurPosition.second + dj[direction] == atual.second){
-            return {di[direction], dj[direction]};
+    if(path.size()>1)atual = path[path.size()-2];
+    
+    if(abs(theseusPosition.first - minotaurPosition.first) + abs(theseusPosition.second - minotaurPosition.second) <= maxDistanceDetectable){
+        for (auto direction : directions)
+        {
+            if (minotaurPosition.first + di[direction] == atual.first && minotaurPosition.second + dj[direction] == atual.second){
+                return {di[direction], dj[direction]};
+            }
+        }
+    }else{
+        std::vector<int> newDirection = {0, 1, 2, 3};
+        std::shuffle(std::begin(newDirection), std::end(newDirection), randomGenerator_);
+        for (auto direction : newDirection)
+        {
+            if (!walls[minotaurPosition.first + di[direction]][minotaurPosition.second + dj[direction]]){
+                return {di[direction], dj[direction]};
+            }
         }
     }
-    return {0, 0};
 
+    return {0, 0};
 }

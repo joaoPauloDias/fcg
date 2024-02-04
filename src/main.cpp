@@ -133,13 +133,15 @@ int main(int argc, char *argv[])
     skybox::SkyBox mySkyBox(textureLoader, &camera);
     scene.AddObject("skybox", &mySkyBox);
 
-    maze::Maze myMaze(textureLoader, 11);
+    maze::Maze myMaze(textureLoader, 21);
     scene.AddObject("maze", &myMaze);
 
     theseus::Theseus myTheseus(textureLoader, &camera);
     scene.AddObject("theseus", &myTheseus);
 
-    minotaur::Minotaur myMinotaur(textureLoader, glm::vec4(2.0f, -1.0f, 2.0f, 1.0f));
+    std::pair<int, int> minotaurStartPosition = myMaze.getRandomFreePosition();
+    std::cout<<minotaurStartPosition.first<<' '<< minotaurStartPosition.second<<std::endl;
+    minotaur::Minotaur myMinotaur(textureLoader, glm::vec4(2.0f * minotaurStartPosition.first, -1.0f, 2.0f * minotaurStartPosition.second, 1.0f));
     scene.AddObject("minotaur", &myMinotaur);
 
     engine::SetActiveScene(&scene);

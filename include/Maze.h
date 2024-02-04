@@ -35,6 +35,7 @@ namespace maze{
         const ObjModel& getModel() const {
             return wallModel;
         }
+        std::pair<int, int> getRandomFreePosition();
         void Render();
         void Update(float dt);
         bool checkCollision(const collisions::Sphere& sphere);
