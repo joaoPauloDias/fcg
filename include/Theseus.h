@@ -16,10 +16,14 @@ namespace theseus
     {
     private:
         ObjModel swordModel;
+        ObjModel shieldModel;
         FreeCamera *freeCamera;
         glm::vec4 position;
         glm::mat4 modelMatrix;
         collisions::Sphere hitBox;
+        glm::mat4 swordModelMatrix;
+        glm::mat4 shieldModelMatrix;
+
         int attackStatus = ATTACK_AVAILABLE;
         float attackTime = 0.0f;
         bool inflictedDamage = false;

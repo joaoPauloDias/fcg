@@ -14,6 +14,9 @@ namespace minotaur {
             int health;
             float velocity;
             std::pair<int, int> nextDirection = {0, 0};
+            bool damageAnimation = false;
+            float damageAnimationTime = 0;
+            texture::TextureLoader textureLoader;
 
         public:
             Minotaur(texture::TextureLoader textureLoader, glm::vec4 position);

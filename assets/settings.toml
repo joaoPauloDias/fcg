@@ -9,6 +9,7 @@ sphere = "../../assets/models/sphere.obj"
 diffuse = "../../assets/textures/Minotaur_diffuse.tga"
 normals = "../../assets/textures/Minotaur_normals.tga"
 specular = "../../assets/textures/Minotaur_specular.tga"
+damage = "../../assets/textures/Minotaur_diffuse_damage.tga"
 
 [textures.pants]
 diffuse = "../../assets/textures/Pants_diffuse.tga"
@@ -31,6 +32,9 @@ diffuse = "../../assets/textures/skybox.jpg"
 
 [textures.wings]
 diffuse = "../../assets/textures/wings.png"
+
+[textures.shield]
+diffuse = "../../assets/textures/shield_diffuse.png"
 
 [shaders]
 vertex = "../../assets/shaders/shader_vertex.glsl"

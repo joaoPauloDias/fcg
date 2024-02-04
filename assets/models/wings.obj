@@ -1,7 +1,7 @@
 # Blender 3.6.2
 # www.blender.org
 mtllib wings.mtl
-o Cube
+o wings
 v -0.082836 -0.814761 0.339626
 v -0.019035 -0.682032 0.366754
 v -0.351051 -0.747306 0.371783

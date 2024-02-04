@@ -21,9 +21,13 @@ extern bool g_RightMouseButtonPressed;
 extern bool FREE;
 
 Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
-    : swordModel("../../assets/models/sword.obj"), freeCamera(camera)
+    : swordModel("../../assets/models/sword.obj"), 
+      shieldModel("../../assets/models/shield.obj"),
+      freeCamera(camera)
+
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
+    swordModel.GetPart("Shield_Sphere.001")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
     position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
     hitBox.center = position;
     hitBox.radius = CAMERA_RADIUS;
@@ -33,8 +37,13 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
 void Theseus::Render() {
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_PHONG);
-    swordModel.ApplyModelMatrix(modelMatrix);
+    swordModel.ApplyModelMatrix(swordModelMatrix);
     swordModel.Draw();
+
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_PHONG);
+    shieldModel.ApplyModelMatrix(shieldModelMatrix);
+    shieldModel.Draw();
 }
 
 void Theseus::Update(float dt) {
@@ -64,18 +73,27 @@ void Theseus::Update(float dt) {
         glm::vec4(0.0f, -0.1f, 0.0f, 0.0f);
 
     //float t = attackTime/ATTACK_ACTIVE_DURATION;
-    modelMatrix = 
+    swordModelMatrix = 
         Matrix_Translate(swordPosition.x, swordPosition.y, swordPosition.z) *
         Matrix_Rotate_Y(freeCamera->theta + M_PI_2 + 0.12f) *
         Matrix_Rotate_Z(M_PI_2 * t) *
         Matrix_Rotate_X(SWORD_X_ANGLE) *
         Matrix_Scale(SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR);
     
+    glm::vec4 shieldPosition = 
+        position + 
+        freeCamera->view_vector * (0.2f + 0.15f*t)- 
+        freeCamera->u * 0.1f + 
+        glm::vec4(0.0f, -0.1f, 0.0f, 0.0f);
+    shieldModelMatrix = 
+        Matrix_Translate(shieldPosition.x, shieldPosition.y, shieldPosition.z) *
+        Matrix_Rotate_Y(freeCamera->theta) * 
+        Matrix_Scale(SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR, SWORD_SCALE_FACTOR);
     
     minotaur::Minotaur* minotaur = (minotaur::Minotaur*) GetVirtualScene()->GetObject("minotaur");
     if (minotaur != nullptr) {
         float swordLength = swordModel.GetPart("sword")->bbox_max.y;
-        glm::vec4 swordTip = modelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
+        glm::vec4 swordTip = swordModelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
 
         if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && collisions::checkCollision(minotaur->getHitbox(), swordTip)) {
             minotaur->ReceiveHit(1);
@@ -94,7 +112,7 @@ void Theseus::Update(float dt) {
             freeCamera->position = hitBox.center;
             break;
         }
-    } 
+    }
 }
 
 void Theseus::AttackAvailable() {

@@ -18,6 +18,7 @@ int auxCount = 0;
 Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj")
 {
     this->position = position;
+    this->textureLoader = textureLoader;
     health = 5;
     velocity = 2.0f;
 
@@ -49,6 +50,15 @@ void Minotaur::Update(float dt)
         std::cout << "Minotauro morreu\n"
                   << std::endl;
         GetVirtualScene()->RemoveObject("minotaur");
+        return;
+    }
+
+    if (damageAnimationTime < 1) {
+        damageAnimationTime += dt;
+    } else {
+        damageAnimation = false;
+        damageAnimationTime = 0;
+        model.GetPart("Body_mesh")->setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     }
 
     float pos_x = position.x / 2.0f;
@@ -82,6 +92,10 @@ void Minotaur::Update(float dt)
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Rotate_Y(angleToTheseus) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
+    
+    if (damageAnimation) {
+        modelMatrix = Matrix_Translate(0.0f, 0.1f * damageAnimationTime, 0.0f) * modelMatrix;
+    }
 
 }
 
@@ -98,6 +112,9 @@ void Minotaur::Render()
 void Minotaur::ReceiveHit(int damage)
 {
     health -= damage;
+    damageAnimation = true;
+    model.GetPart("Body_mesh")->setTextures(
+        textureLoader.GetTexture("minotaur_damage"), NULL, NULL);
     std::cout << "ouch\n";
 }
 
