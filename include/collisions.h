@@ -25,4 +25,4 @@ bool cubeSphereCollision(
 
 bool cylinderPointCollision(const Cylinder& cylinder, const  glm::vec4& point);
 
-
+bool cylinderSphereCollision(const Cylinder& cylinder, const Sphere& sphere);

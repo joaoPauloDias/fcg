@@ -30,6 +30,10 @@ namespace theseus
         {
             return position;
         }
+        const Sphere &getHitBox() const
+        {
+            return hitBox;
+        }
         void Render();
         void Update(float dt);
         void AttackAvailable();

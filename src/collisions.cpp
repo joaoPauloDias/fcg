@@ -32,3 +32,29 @@ bool cylinderPointCollision(const Cylinder& cylinder, const glm::vec4& point) {
 
     return minCylinderHeight <= point.y && point.y <= maxCylinderHeight && distanceFromAxis <= (cylinder.radius * cylinder.radius);
 }
+
+float distance(glm::vec4 a, glm::vec4 b){
+    return pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2);
+}
+
+bool cylinderSphereCollision(const Cylinder& cylinder, const Sphere& sphere) {
+
+    float minCylinderHeight = cylinder.center.y - cylinder.height/2;
+    float maxCylinderHeight = cylinder.center.y + cylinder.height/2;
+    float distanceFromAxis = pow(cylinder.center.x - sphere.center.x, 2) + pow(cylinder.center.z - sphere.center.z, 2);
+    float distanceSquared;
+
+    if(sphere.center.y >= minCylinderHeight && sphere.center.y <= maxCylinderHeight){
+        distanceSquared = distanceFromAxis;
+    }else if (sphere.center.y < minCylinderHeight)
+    {
+        distanceSquared = distance(sphere.center, (cylinder.center - glm::vec4{0, cylinder.height/2, 0, 0}));
+    }else{
+        distanceSquared = distance(sphere.center, (cylinder.center + glm::vec4{0, cylinder.height/2, 0, 0}));
+    }
+
+    float radiusSum = sphere.radius + cylinder.radius;
+    return distanceSquared <= (radiusSum * radiusSum);
+    
+}
+

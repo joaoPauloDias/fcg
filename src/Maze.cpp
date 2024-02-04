@@ -123,7 +123,6 @@ bool Maze::checkCollision(const Sphere& sphere) {
             }
         }
         if (collision) {
-            std::cout<<"COLLISION\n";
             break;
         }
     }
