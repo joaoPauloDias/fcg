@@ -45,16 +45,19 @@ void Minotaur::Update(float dt)
         GetVirtualScene()->RemoveObject("minotaur");
     }
 
-    bool int_x = abs(position.x - int(position.x)) <= 1e-5;
-    bool int_z = abs(position.z - int(position.z)) <= 1e-5;
-    bool even_x = int(position.x) % 2 == 0;
-    bool even_z = int(position.z) % 2 == 0;
-    if (int_x && int_z && even_x && even_z) {
-        nextDirection = GetNextPosition();
-    }
+    //maze::Maze* maze GetVirtualScene()->GetObject("maze")
+    float grid_x = position.x / 2.0f;
+    float grid_z = position.z / 2.0f;
+    bool int_x = abs(grid_x - round(grid_x)) <= 1e-5;
+    bool int_z = abs(grid_z - round(grid_z)) <= 1e-5;
 
-    position.x += nextDirection.first*dt;
-    position.z += nextDirection.second*dt;
+    //printf("%.2f, %.2f, %.2f, %.2f\n", grid_x, grid_z, round(grid_x), round(grid_z));
+    auto [i,j] = GetNextPosition();
+
+    position.x += i;
+    position.z += j;
+    // position.x += nextDirection.first*dt;
+    // position.z += nextDirection.second*dt;
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
@@ -73,6 +76,7 @@ void Minotaur::Render()
 void Minotaur::ReceiveHit(int damage)
 {
     health -= damage;
+    std::cout << "ouch\n";
 }
 
 std::pair<int, int> Minotaur::GetNextPosition()
@@ -83,8 +87,8 @@ std::pair<int, int> Minotaur::GetNextPosition()
     std::vector<std::vector<bool>> walls = maze->getWalls();
     std::vector<std::vector<std::pair<int, int>>> visited(maze->size_, std::vector<std::pair<int, int>>(maze->size_, {-1, -1}));
 
-    int di[] = {-1, 1, 0, 0, 0};
-    int dj[] = {0, 0, -1, 1, 0};
+    int di[] = {-1, 1, 0, 0};
+    int dj[] = {0, 0, -1, 1};
     std::vector<int> directions = {0, 1, 2, 3};
     std::vector<std::string> directionsNames = {"OESTE", "LESTE", "SUL", "NORTE"};
     std::stack<std::pair<int, int>> s;
@@ -111,47 +115,29 @@ std::pair<int, int> Minotaur::GetNextPosition()
         }
     }
 
-    // std::vector<std::vector<bool>> isPath(maze->size_, std::vector<bool>(maze->size_, false));
-
     std::pair<int, int> atual = theseusPosition;
     std::vector<std::pair<int, int>> path;
     path.push_back(atual);
     while ((visited[atual.first][atual.second].first != 0 && visited[atual.first][atual.second].second != 0))
     {
-        // isPath[atual.first][atual.second] = true;
         atual = visited[atual.first][atual.second];
+
+        // It is impossible to reach theseus
+        if (atual.first == -1) {
+            return {0, 0};
+        }
         path.push_back(atual);
 
     }
 
     if(path.size()>1)atual = path[path.size()-2];
-    //return atual;
-    
 
-    // bool move = false;
-    directions.push_back(4);
     for (auto direction : directions)
     {
         if (minotaurPosition.first + di[direction] == atual.first && minotaurPosition.second + dj[direction] == atual.second){
             return {di[direction], dj[direction]};
         }
     }
-    // if(!move)std::cout<<"HIT"<<std::endl;
+    return {0, 0};
 
-
-    // for (int i = 0; i < maze->size_; i++)
-    // {
-    //     for (int j = 0; j < maze->size_; j++)
-    //     {
-    //         char cell;
-    //         if(walls[i][j])
-    //             cell = '#';
-    //         else if(isPath[i][j])
-    //             cell = 'x';
-    //         else
-    //             cell = '.';
-    //         std::cout << cell;
-    //     }
-    //     std::cout << std::endl;
-    // }
 }
