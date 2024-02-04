@@ -60,9 +60,17 @@ void Minotaur::Update(float dt)
         nextDirection = GetNextPosition();
     }
 
+
+    // Orientation towards Theseus
+    glm::vec4 theseusPosition = dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"))->getPosition();
+    glm::vec4 directionToTheseus = (theseusPosition - position)/norm(theseusPosition - position);
+    float angleToTheseus = atan2(directionToTheseus.x, directionToTheseus.z);
+
+
     position.x += nextDirection.first*dt*velocity;
     position.z += nextDirection.second*dt*velocity;
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
+                  Matrix_Rotate_Y(angleToTheseus) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
 }
@@ -94,7 +102,6 @@ std::pair<int, int> Minotaur::GetNextPosition()
     int di[] = {-1, 1, 0, 0};
     int dj[] = {0, 0, -1, 1};
     std::vector<int> directions = {0, 1, 2, 3};
-    std::vector<std::string> directionsNames = {"OESTE", "LESTE", "SUL", "NORTE"};
     std::stack<std::pair<int, int>> s;
     s.push(minotaurPosition);
     visited[minotaurPosition.first][minotaurPosition.second] = {0, 0};
