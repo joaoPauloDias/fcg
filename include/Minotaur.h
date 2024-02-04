@@ -12,6 +12,7 @@ namespace minotaur {
             ObjModel model;
             Cylinder hitBox;
             int health;
+            float velocity;
             std::pair<int, int> nextDirection = {0, 0};
 
         public:

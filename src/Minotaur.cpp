@@ -15,6 +15,7 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
 {
     this->position = position;
     health = 5;
+    velocity = 2.0f;
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
@@ -59,8 +60,8 @@ void Minotaur::Update(float dt)
         nextDirection = GetNextPosition();
     }
 
-    position.x += nextDirection.first*dt;
-    position.z += nextDirection.second*dt;
+    position.x += nextDirection.first*dt*velocity;
+    position.z += nextDirection.second*dt*velocity;
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
