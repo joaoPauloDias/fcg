@@ -4,6 +4,7 @@
 #include "ObjModel.h"
 #include "TextureLoader.h"
 #include "matrices.h"
+#include "collisions.h"
 #include <vector> 
 #include <stack>
 #include <random>
@@ -36,6 +37,6 @@ namespace maze{
         }
         void Render();
         void Update(float dt);
-        bool checkCollision(glm::vec4 position, float radius);
+        bool checkCollision(const collisions::Sphere& sphere);
     };
 }

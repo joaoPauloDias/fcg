@@ -6,10 +6,14 @@
 #include "TextureLoader.h"
 #include "Maze.h"
 #include "Theseus.h"
+#include "collisions.h"
+
 
 using namespace minotaur;
 
 #define SCALE_FACTOR 0.018f
+
+int auxCount = 0;
 
 Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj")
 {
@@ -32,7 +36,7 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
     hitBox.radius = 0.6f;
 }
 
-Cylinder Minotaur::getHitbox()
+collisions::Cylinder Minotaur::getHitbox()
 {
     hitBox.center = this->position + glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
     return hitBox;
@@ -60,15 +64,21 @@ void Minotaur::Update(float dt)
         nextDirection = GetNextPosition();
     }
 
-
     // Orientation towards Theseus
-    glm::vec4 theseusPosition = dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"))->getPosition();
+    theseus::Theseus* theseus = dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"));
+    glm::vec4 theseusPosition = theseus->getPosition();
     glm::vec4 directionToTheseus = (theseusPosition - position)/norm(theseusPosition - position);
     float angleToTheseus = atan2(directionToTheseus.x, directionToTheseus.z);
 
+    // collision with theseus
+    if(!collisions::checkCollision(getHitbox(), theseus->getHitBox())){
+        position.x += nextDirection.first*dt*velocity;
+        position.z += nextDirection.second*dt*velocity;
+    }else{
+        std::cout<<"MINOHIT "<< auxCount++<<std::endl;
+    }
 
-    position.x += nextDirection.first*dt*velocity;
-    position.z += nextDirection.second*dt*velocity;
+
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Rotate_Y(angleToTheseus) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
