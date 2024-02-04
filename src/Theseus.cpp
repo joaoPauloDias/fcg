@@ -18,6 +18,7 @@ using namespace theseus;
 
 extern bool g_LeftMouseButtonPressed;
 extern bool g_RightMouseButtonPressed;
+extern bool FREE;
 
 Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     : swordModel("../../assets/models/sword.obj"), freeCamera(camera)
@@ -81,11 +82,17 @@ void Theseus::Update(float dt) {
     }
 
     maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
-    glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt);
-    if(!maze->checkCollision(newCameraPosition, CAMERA_RADIUS)) {
-        position = newCameraPosition;
-        freeCamera->position = newCameraPosition;
-    }
+
+    std::pair<bool, bool> dirs[] = {{true, true}, {true, false}, {false, true}};
+
+    for (auto [update_x, update_z] : dirs) {
+        glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt, update_x, FREE, update_z);
+        if(!maze->checkCollision(newCameraPosition, CAMERA_RADIUS)) {
+            position = newCameraPosition;
+            freeCamera->position = newCameraPosition;
+            break;
+        }
+    } 
 }
 
 void Theseus::AttackAvailable() {

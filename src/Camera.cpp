@@ -84,7 +84,7 @@ FreeCamera::FreeCamera(float t, float p, glm::vec4 pos, float s) {
 }
 
 
-glm::vec4 FreeCamera::getNewPosition(float dt) {
+glm::vec4 FreeCamera::getNewPosition(float dt, bool update_x, bool update_y, bool update_z) {
     float y = sin(phi);
     float z = cos(phi)*cos(theta);
     float x = cos(phi)*sin(theta);
@@ -96,19 +96,21 @@ glm::vec4 FreeCamera::getNewPosition(float dt) {
 
     w = -camera_view_vector/norm(camera_view_vector);
     u = crossproduct(camera_up_vector, w);
+
     glm::vec4 new_position = position;
+    glm::vec4 updateMask = glm::vec4(update_x, update_y, update_z, 1.0f);
 
     if (wPressed) {
-        new_position -= w * speed * dt;
+        new_position -= w * speed * dt * updateMask;
     }
     if (sPressed) {
-        new_position += w * speed * dt;
+        new_position += w * speed * dt * updateMask;
     }
     if (aPressed) {
-        new_position -= u * speed * dt;
+        new_position -= u * speed * dt * updateMask;
     }
     if (dPressed) {
-        new_position += u * speed * dt;
+        new_position += u * speed * dt * updateMask;
     }
 
     return new_position;

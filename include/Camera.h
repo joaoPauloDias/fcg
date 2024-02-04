@@ -33,5 +33,5 @@ struct FreeCamera {
     void handleScroll(double xoffset, double yoffset);
     void handleCursor(double dx, double dy);
     void handleKey(int key, int scancode, int action, int mod);
-    glm::vec4 getNewPosition(float dt);
+    glm::vec4 getNewPosition(float dt, bool update_x=true, bool update_y=true, bool update_z=true);
 };
