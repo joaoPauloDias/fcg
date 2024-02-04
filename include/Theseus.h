@@ -10,6 +10,9 @@
 #define ATTACK_AVAILABLE 0
 #define ATTACK_ACTIVE 1
 #define ATTACK_IN_COOLDOWN 2
+#define DEFENSE_AVAILABLE 0
+#define DEFENSE_ACTIVE 1
+#define DEFENSE_IN_COOLDOWN 2
 
 namespace theseus
 {
@@ -28,6 +31,8 @@ namespace theseus
         int attackStatus = ATTACK_AVAILABLE;
         float attackTime = 0.0f;
         bool inflictedDamage = false;
+        int defenseStatus = DEFENSE_AVAILABLE;
+        float defenseTime = 0.0f;
 
     public:
         Theseus(texture::TextureLoader textureLoader, FreeCamera *camera);
@@ -44,6 +49,9 @@ namespace theseus
         void AttackAvailable();
         void AttackCooldown(float dt, float &t);
         void AttackActive(float dt, float &t);
+        void DefenseAvailable(float dt);
+        void DefenseCooldown(float dt, float &t);
+        void DefenseActive(float dt, float &t);
         void CheckMinotaurInteraction(float dt);
         glm::vec4 getNewPosition(float dt, bool update_x, bool update_y,
                                  bool update_z);

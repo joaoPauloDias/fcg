@@ -11,6 +11,10 @@
 #define ATTACK_ACTIVE_DURATION 0.3
 #define ATTACK_COOLDOWN_DURATION 0.5
 
+#define ATTACK_SETUP_DURATION 0.3
+#define ATTACK_COOLDOWN_DURATION 0.5
+
+
 #define CAMERA_RADIUS 0.5f
 #define SWORD_SCALE_FACTOR 0.04f
 #define SHIELD_SCALE_FACTOR 0.07f
@@ -73,6 +77,23 @@ void Theseus::Update(float dt) {
             break;
     }
 
+
+    switch (defenseStatus) {
+        case DEFENSE_AVAILABLE:
+            DefenseAvailable(dt);
+            break;
+
+        case DEFENSE_ACTIVE:
+            DefenseActive(dt, t);
+            break;
+        
+        case DEFENSE_IN_COOLDOWN:
+            DefenseCooldown(dt, t);
+            break;
+        default:
+            break;
+    }
+
     // It is important to compute the sword model matrix before updating the position attribute
     // to draw the sword in the correct position
     glm::vec4 swordPosition = 
@@ -91,7 +112,7 @@ void Theseus::Update(float dt) {
     
     glm::vec4 shieldPosition = 
         position + 
-        freeCamera->view_vector * 0.2f - 
+        freeCamera->view_vector * (0.2f + 0.15f * defenseTime) - 
         freeCamera->u * 0.1f + 
         glm::vec4(0.0f, -0.1f, 0.0f, 0.0f);
     shieldModelMatrix = 
@@ -104,7 +125,7 @@ void Theseus::Update(float dt) {
 }
 
 void Theseus::AttackAvailable() {
-    if (g_LeftMouseButtonPressed) {
+    if (g_LeftMouseButtonPressed && defenseStatus == DEFENSE_AVAILABLE) {
         attackTime = 0;
         attackStatus = ATTACK_ACTIVE;
     }
@@ -118,6 +139,34 @@ void theseus::Theseus::AttackActive(float dt, float& t) {
     if (attackTime >= ATTACK_ACTIVE_DURATION) {
         attackTime = ATTACK_COOLDOWN_DURATION;
         attackStatus = ATTACK_IN_COOLDOWN;
+    }
+}
+
+
+void theseus::Theseus::DefenseCooldown(float dt, float& t) {
+    if (defenseTime > 0) {
+        defenseTime -= dt;
+    } else {
+        defenseTime = 0;
+        defenseStatus = DEFENSE_AVAILABLE;
+    }
+}
+
+void Theseus::DefenseAvailable(float dt) {
+    if (g_RightMouseButtonPressed && defenseTime >= 0.5) {
+        defenseTime = 0.5;
+        defenseStatus = DEFENSE_ACTIVE;
+    } else if (g_RightMouseButtonPressed && defenseTime < 0.5) {
+        defenseTime += dt;
+    }
+    if (!g_RightMouseButtonPressed && defenseTime > 0) {
+        defenseStatus = DEFENSE_IN_COOLDOWN;
+    }
+}
+
+void theseus::Theseus::DefenseActive(float dt, float& t) {
+    if (!g_RightMouseButtonPressed) {
+        defenseStatus = DEFENSE_IN_COOLDOWN;
     }
 }
 
@@ -150,6 +199,8 @@ void theseus::Theseus::CheckMinotaurInteraction(float dt) {
         inflictedDamage = true;
     }
 
+    if (defenseStatus == DEFENSE_ACTIVE)
+        return;
     maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
 
     if (collisions::checkCollision(minotaurHitbox, getHitBox())) {
