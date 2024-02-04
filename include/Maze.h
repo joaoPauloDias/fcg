@@ -37,6 +37,6 @@ namespace maze{
         }
         void Render();
         void Update(float dt);
-        bool checkCollision(const Sphere& sphere);
+        bool checkCollision(const collisions::Sphere& sphere);
     };
 }

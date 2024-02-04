@@ -10,14 +10,14 @@ namespace minotaur {
             glm::vec4 position;
             glm::mat4 modelMatrix;
             ObjModel model;
-            Cylinder hitBox;
+            collisions::Cylinder hitBox;
             int health;
             float velocity;
             std::pair<int, int> nextDirection = {0, 0};
 
         public:
             Minotaur(texture::TextureLoader textureLoader, glm::vec4 position);
-            Cylinder getHitbox();
+            collisions::Cylinder getHitbox();
             std::pair<int, int> GetNextPosition();
             void ReceiveHit(int damage);
             void Render();

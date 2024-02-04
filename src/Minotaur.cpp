@@ -36,7 +36,7 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
     hitBox.radius = 0.6f;
 }
 
-Cylinder Minotaur::getHitbox()
+collisions::Cylinder Minotaur::getHitbox()
 {
     hitBox.center = this->position + glm::vec4(0.0f, 1.0f, 0.0f, 0.0f);
     return hitBox;
@@ -71,9 +71,7 @@ void Minotaur::Update(float dt)
     float angleToTheseus = atan2(directionToTheseus.x, directionToTheseus.z);
 
     // collision with theseus
-    Sphere theseusHitBox = theseus->getHitBox();
-
-    if(!cylinderSphereCollision(getHitbox(), theseusHitBox)){
+    if(!collisions::checkCollision(getHitbox(), theseus->getHitBox())){
         position.x += nextDirection.first*dt*velocity;
         position.z += nextDirection.second*dt*velocity;
     }else{

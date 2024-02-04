@@ -77,7 +77,7 @@ void Theseus::Update(float dt) {
         float swordLength = swordModel.GetPart("sword")->bbox_max.y;
         glm::vec4 swordTip = modelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
 
-        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && cylinderPointCollision(minotaur->getHitbox(), swordTip)) {
+        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && collisions::checkCollision(minotaur->getHitbox(), swordTip)) {
             minotaur->ReceiveHit(1);
             inflictedDamage = true;
         }

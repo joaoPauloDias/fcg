@@ -19,7 +19,7 @@ namespace theseus
         FreeCamera *freeCamera;
         glm::vec4 position;
         glm::mat4 modelMatrix;
-        Sphere hitBox;
+        collisions::Sphere hitBox;
         int attackStatus = ATTACK_AVAILABLE;
         float attackTime = 0.0f;
         bool inflictedDamage = false;
@@ -30,7 +30,7 @@ namespace theseus
         {
             return position;
         }
-        const Sphere &getHitBox() const
+        const collisions::Sphere &getHitBox() const
         {
             return hitBox;
         }
