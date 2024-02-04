@@ -22,7 +22,7 @@ bool cubeSphereCollision(
     float distanceSquared = glm::length(sphereCenter - closestPointInCube);
 
     // Check if the distance is less than or equal to the radius
-    return distanceSquared <= (radius * radius);
+    return distanceSquared <= radius;
 }
 
 bool checkCollision(Cylinder cylinder, glm::vec4 point) {

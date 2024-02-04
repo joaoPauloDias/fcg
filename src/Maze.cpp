@@ -108,8 +108,8 @@ void Maze::Update(float dt) {
 }
 
 std::pair<int, int> Maze::getMazeIndex(glm::vec4 position){
-    int i = std::round(position.x / 2.0f);
-    int j = std::round(position.z / 2.0f);
+    int i = std::clamp(std::round(position.x / 2.0f), 1.0f, size_-2.0f);
+    int j = std::clamp(std::round(position.z / 2.0f), 1.0f, size_-2.0f);
     return {i, j};
 }
 
@@ -123,6 +123,7 @@ bool Maze::checkCollision(glm::vec4 position, float radius) {
             }
         }
         if (collision) {
+            std::cout<<"COLLISION\n";
             break;
         }
     }
