@@ -25,6 +25,8 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     position = glm::vec4(2.0f, 2.0f, 2.0f, 1.0f);
+    hitBox.center = position;
+    hitBox.radius = CAMERA_RADIUS;
 }
 
 
@@ -75,7 +77,7 @@ void Theseus::Update(float dt) {
         float swordLength = swordModel.GetPart("sword")->bbox_max.y;
         glm::vec4 swordTip = modelMatrix * glm::vec4(0.0f, swordLength, 0.0f, 1.0f);
 
-        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && checkCollision(minotaur->getHitbox(), swordTip)) {
+        if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && cylinderPointCollision(minotaur->getHitbox(), swordTip)) {
             minotaur->ReceiveHit(1);
             inflictedDamage = true;
         }
@@ -86,10 +88,10 @@ void Theseus::Update(float dt) {
     std::pair<bool, bool> dirs[] = {{true, true}, {true, false}, {false, true}};
 
     for (auto [update_x, update_z] : dirs) {
-        glm::vec4 newCameraPosition = freeCamera->getNewPosition(dt, update_x, FREE, update_z);
-        if(!maze->checkCollision(newCameraPosition, CAMERA_RADIUS)) {
-            position = newCameraPosition;
-            freeCamera->position = newCameraPosition;
+        hitBox.center = freeCamera->getNewPosition(dt, update_x, FREE, update_z);
+        if(!maze->checkCollision(hitBox)) {
+            position = hitBox.center;
+            freeCamera->position = hitBox.center;
             break;
         }
     } 

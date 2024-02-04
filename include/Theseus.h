@@ -4,6 +4,7 @@
 #include "ObjModel.h"
 #include "TextureLoader.h"
 #include "Camera.h"
+#include "collisions.h"
 
 #define ATTACK_AVAILABLE 0
 #define ATTACK_ACTIVE 1
@@ -18,7 +19,7 @@ namespace theseus
         FreeCamera *freeCamera;
         glm::vec4 position;
         glm::mat4 modelMatrix;
-
+        Sphere hitBox;
         int attackStatus = ATTACK_AVAILABLE;
         float attackTime = 0.0f;
         bool inflictedDamage = false;

@@ -113,11 +113,11 @@ std::pair<int, int> Maze::getMazeIndex(glm::vec4 position){
     return {i, j};
 }
 
-bool Maze::checkCollision(glm::vec4 position, float radius) {
+bool Maze::checkCollision(const Sphere& sphere) {
     bool collision = false;
     for (auto  &&[isWall, m] : getBlockMatrices()){
         for (auto &&[partName, partModel]: wallModel.parts){
-            if(cubeSphereCollision(position, radius, partModel.bbox_min, partModel.bbox_max, m)){
+            if(cubeSphereCollision(sphere, partModel.bbox_min, partModel.bbox_max, m)){
                 collision = true;
                 break;
             }

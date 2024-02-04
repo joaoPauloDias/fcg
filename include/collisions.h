@@ -12,9 +12,17 @@ struct Cylinder {
 };
 
 
+struct Sphere {
+    glm::vec4 center;
+    float radius;
+};
+
+
 bool cubeSphereCollision(
-    const glm::vec4& center, float radius, 
+    const Sphere& sphere, 
     const glm::vec3& bbox_min, const glm::vec3& bbox_max, const glm::mat4& modelMatrix
 );
 
-bool checkCollision(Cylinder cylinder, glm::vec4 point);
+bool cylinderPointCollision(const Cylinder& cylinder, const  glm::vec4& point);
+
+
