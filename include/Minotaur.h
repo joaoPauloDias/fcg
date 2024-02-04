@@ -12,6 +12,7 @@ namespace minotaur {
             ObjModel model;
             Cylinder hitBox;
             int health;
+            std::pair<int, int> nextDirection = {0, 0};
 
         public:
             Minotaur(texture::TextureLoader textureLoader, glm::vec4 position);

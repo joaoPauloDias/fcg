@@ -44,9 +44,17 @@ void Minotaur::Update(float dt)
                   << std::endl;
         GetVirtualScene()->RemoveObject("minotaur");
     }
-    auto [i, j] = GetNextPosition();
-    position.x += i*dt;
-    position.z += j*dt;
+
+    glm::vec4 gridPosition = position / 2.0f;
+
+    if (abs(gridPosition.x - round(gridPosition.x)) <= 1e-5 && abs(gridPosition.z - round(gridPosition.z)) <= 1e-5) {
+        nextDirection = GetNextPosition();
+    }
+
+    PrintVector(position);
+
+    position.x += nextDirection.first*dt;
+    position.z += nextDirection.second*dt;
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
 
