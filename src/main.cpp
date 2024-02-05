@@ -58,6 +58,7 @@
 #include "VirtualScene.h"
 #include "GameScene.h"
 #include "MenuScene.h"
+#include "globals.h"
 
 
 
@@ -69,6 +70,9 @@ GLint g_projection_uniform;
 GLint g_object_id_uniform;
 GLint g_bbox_min_uniform;
 GLint g_bbox_max_uniform;
+
+
+ActiveScene activeScene = MENU_SCENE;
 
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.
@@ -125,12 +129,18 @@ int main(int argc, char *argv[])
         }
     }
 
-    GameScene scene(textureLoader);
+    GameScene game(textureLoader);
     MenuScene menu(textureLoader);
 
-    //engine::SetActiveScene(&scene);
     engine::SetActiveScene(&menu);
-    engine::Run(window);
+    engine::Run(window, [&](){
+        switch (activeScene) {
+        case MENU_SCENE:
+            return (VirtualScene*)&menu;
+        case GAME_SCENE:
+            return (VirtualScene*)&game;
+        }
+    });
 
     // Fim do programa
     return 0;

@@ -18,4 +18,5 @@ class GameScene : public VirtualScene {
 
     public:
         GameScene(texture::TextureLoader);
+        void UpdateScene(float dt);
 };

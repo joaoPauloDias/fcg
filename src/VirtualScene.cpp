@@ -11,9 +11,7 @@ void VirtualScene::RenderScene() {
 void VirtualScene::UpdateScene(float dt) {
     camera->update(dt);
     for (auto &&[name, object]: objects) {
-        std::cout << name << std::endl;
         object->Update(dt);
-        std::cout << "depois:" <<name << std::endl;
     }
 }
 

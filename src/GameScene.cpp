@@ -1,5 +1,7 @@
 #include "GameScene.h"
+#include "globals.h"
 
+extern ActiveScene activeScene;
 
 GameScene::GameScene(texture::TextureLoader textureLoader) :
     camera(3.14f, -0.7f, glm::vec4(1.7f, 0.2f, 1.7f, 1.0f), 5.0f),

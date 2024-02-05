@@ -23,26 +23,35 @@ LookAtCamera::LookAtCamera(float t, float p, float d) {
 }
 
 void LookAtCamera::update(float dt) {
+    
     float r = distance;
     float y = r*sin(phi);
     float z = r*cos(phi)*cos(theta);
     float x = r*cos(phi)*sin(theta);
+    //printf("r: %.2f, y: %.2f, z: %.2f, x:%.2f\n", r,y,z,x);
+
+    float lx = 21.0f;
+    float ly = 0.0f;
+    float lz = 21.0f;
 
     // Abaixo definimos as varáveis que efetivamente definem a câmera virtual.
     // Veja slides 195-227 e 229-234 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-    glm::vec4 camera_position_c  = glm::vec4(x,y,z,1.0f); // Ponto "c", centro da câmera
-    glm::vec4 camera_lookat_l    = glm::vec4(0.0f,0.0f,0.0f,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
-    glm::vec4 camera_view_vector = camera_lookat_l - camera_position_c; // Vetor "view", sentido para onde a câmera está virada
+    glm::vec4 camera_lookat_l    = glm::vec4(lx,ly,lz,1.0f); // Ponto "l", para onde a câmera (look-at) estará sempre olhando
+    position  = glm::vec4(x+lx,y+ly,z+lz,1.0f); // Ponto "c", centro da câmera
+    view_vector = camera_lookat_l - position; // Vetor "view", sentido para onde a câmera está virada
     glm::vec4 camera_up_vector   = glm::vec4(0.0f,1.0f,0.0f,0.0f); // Vetor "up" fixado para apontar para o "céu" (eito Y global)
+
+    w = -view_vector/norm(view_vector);
+    u = crossproduct(camera_up_vector, w);
 
     // Computamos a matriz "View" utilizando os parâmetros da câmera para
     // definir o sistema de coordenadas da câmera.  Veja slides 2-14, 184-190 e 236-242 do documento Aula_08_Sistemas_de_Coordenadas.pdf.
-    glm::mat4 view = Matrix_Camera_View(camera_position_c, camera_view_vector, camera_up_vector);
+    glm::mat4 view = Matrix_Camera_View(position, view_vector, camera_up_vector);
 
     // Note que, no sistema de coordenadas da câmera, os planos near e far
     // estão no sentido negativo! Veja slides 176-204 do documento Aula_09_Projecoes.pdf.
     float nearplane = -0.01f;  // Posição do "near plane"
-    float farplane  = -120.0f; // Posição do "far plane"
+    float farplane  = -150.0f; // Posição do "far plane"
 
     float field_of_view = 3.141592 / 3.0f;
     glm::mat4 projection = Matrix_Perspective(field_of_view, g_ScreenRatio, nearplane, farplane);  
@@ -69,7 +78,7 @@ void LookAtCamera::handleCursor(double dx, double dy) {
 
     // Em coordenadas esféricas, o ângulo phi deve ficar entre -pi/2 e +pi/2.
     float phimax = 3.141592f/2;
-    float phimin = -phimax;
+    float phimin = 0.15f;
 
     if (phi > phimax)
         phi = phimax;

@@ -6,6 +6,7 @@
 #include <string>
 #include <stdexcept>
 
+
 #include "matrices.h"
 #include "textrendering.h"
 #include "utils.h"
@@ -279,7 +280,7 @@ namespace engine
         TextRendering_PrintString(window, buffer, 1.0f - (numchars + 1) * charwidth, 1.0f - lineheight, 1.0f);
     }
 
-    void Run(GLFWwindow *window)
+    void Run(GLFWwindow *window, std::function<VirtualScene*()> getActiveScene)
     {
         // Inicializamos o código para renderização de texto.
         TextRendering_Init();
@@ -316,6 +317,7 @@ namespace engine
 
             glUseProgram(g_GpuProgramID);
             
+            activeScene = getActiveScene();
             activeScene->UpdateScene(dt);
             activeScene->RenderScene();
 

@@ -2,20 +2,22 @@
 #include "matrices.h"
 #include "globals.h"
 
-#define SCALE_FACTOR_X 3.3f
-#define SCALE_FACTOR_Y 1.0f
+#define SCALE_FACTOR_X 3.3f * 0.5f
+#define SCALE_FACTOR_Z 1.0f * 0.5f
 
-
+extern ActiveScene activeScene;
+extern bool g_LeftMouseButtonPressed;
 using namespace plane;
 
-Plane::Plane(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/plane.obj")
+Plane::Plane(texture::TextureLoader textureLoader, glm::vec4 position, Camera *camera) : model("../../assets/models/plane.obj")
 {
     this->position = position;
     this->textureLoader = textureLoader;
+    this->camera = camera;
     
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
-                  Matrix_Scale(SCALE_FACTOR_X, SCALE_FACTOR_Y, 1.0f);
+                  Matrix_Scale(SCALE_FACTOR_X, 1.0f, SCALE_FACTOR_Z);
 
     model.GetPart("plane")->setTextures(textureLoader.GetTexture("plane_diffuse"), NULL, NULL);
 }
@@ -30,5 +32,14 @@ void Plane::Render(){
 }
 
 void Plane::Update(float dt){
-    
+    glm::mat4 m = Matrix_Camera_View(camera->position, camera->view_vector, glm::vec4(0, 1, 0, 0));
+
+    modelMatrix = glm::inverse(m) *
+                  Matrix_Translate(0, -0.5, -4) *
+                  Matrix_Rotate_X(M_PI_2) *
+                  Matrix_Scale(SCALE_FACTOR_X, 1.0f, SCALE_FACTOR_Z);
+
+    if (activeScene == MENU_SCENE && g_LeftMouseButtonPressed) {
+        activeScene = GAME_SCENE;
+    }
 }

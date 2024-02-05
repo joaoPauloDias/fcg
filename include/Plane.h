@@ -4,6 +4,7 @@
 #include "glm/vec4.hpp"
 #include "ObjModel.h"
 #include "TextureLoader.h"
+#include "Camera.h"
 
 
 namespace plane {
@@ -13,9 +14,10 @@ namespace plane {
             glm::mat4 modelMatrix;
             ObjModel model;
             texture::TextureLoader textureLoader;
+            Camera *camera;
 
         public:
-            Plane(texture::TextureLoader textureLoader, glm::vec4 position);
+            Plane(texture::TextureLoader textureLoader, glm::vec4 position, Camera *camera);
             void Render();
             void Update(float dt);
     };
