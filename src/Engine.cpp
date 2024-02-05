@@ -19,7 +19,6 @@
 void LoadShadersFromFiles();
 void TextRendering_Init();
 extern float g_ScreenRatio;
-extern FreeCamera camera;
 
 // Variável que controla se o texto informativo será mostrado na tela.
 bool g_ShowInfoText = true;
@@ -79,7 +78,7 @@ namespace engine
         // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
         glfwMakeContextCurrent(window);
 
-        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
         // biblioteca GLAD.
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -203,7 +202,7 @@ namespace engine
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
 
-        camera.handleCursor(dx, dy);
+        activeScene->GetFreeCamera()->handleCursor(dx, dy);
 
         g_LastCursorPosX = xpos;
         g_LastCursorPosY = ypos;
@@ -212,7 +211,7 @@ namespace engine
     // Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.
     void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
     {
-        camera.handleScroll(xoffset, yoffset);
+        activeScene->GetFreeCamera()->handleScroll(xoffset, yoffset);
     }
 
     // Definição da função que será chamada sempre que o usuário pressionar alguma
@@ -223,7 +222,7 @@ namespace engine
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
-        camera.handleKey(key, scancode, action, mod);
+        activeScene->GetFreeCamera()->handleKey(key, scancode, action, mod);
 
         // Se o usuário apertar a tecla H, fazemos um "toggle" do texto informativo mostrado na tela.
         if (key == GLFW_KEY_H && action == GLFW_PRESS)
@@ -317,7 +316,6 @@ namespace engine
 
             glUseProgram(g_GpuProgramID);
             
-            camera.update(dt);
             activeScene->UpdateScene(dt);
             activeScene->RenderScene();
 

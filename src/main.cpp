@@ -55,12 +55,8 @@
 #include "Camera.h"
 #include "Engine.h"
 #include "TextureLoader.h"
-#include "Maze.h"
-#include "Theseus.h"
-#include "Minotaur.h"
-#include "SkyBox.h"
-
 #include "VirtualScene.h"
+#include "GameScene.h"
 
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -94,7 +90,7 @@ std::stack<glm::mat4> g_MatrixStack;
 float g_ScreenRatio = 1.0f;
 
 // LookAtCamera camera(0.0f, 0.0f, 3.5f);
-FreeCamera camera(3.14f, -0.7f, glm::vec4(1.7f, 0.2f, 1.7f, 1.0f), 5.0f);
+
 texture::TextureLoader textureLoader;
 
 // Declaração de várias funções utilizadas em main().  Essas estão definidas
@@ -113,7 +109,6 @@ int main(int argc, char *argv[])
     // para renderização. Veja slides 180-200 do documento Aula_03_Rendering_Pipeline_Grafico.pdf.
     //
     LoadShadersFromFiles();
-
     // Load and parse the TOML configuration
     auto config = toml::parse_file("../../assets/settings.toml");
 
@@ -128,21 +123,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    VirtualScene scene;
-
-    skybox::SkyBox mySkyBox(textureLoader, &camera);
-    scene.AddObject("skybox", &mySkyBox);
-
-    maze::Maze myMaze(textureLoader, 21);
-    scene.AddObject("maze", &myMaze);
-
-    theseus::Theseus myTheseus(textureLoader, &camera);
-    scene.AddObject("theseus", &myTheseus);
-
-    std::pair<int, int> minotaurStartPosition = myMaze.getRandomFreePosition();
-    std::cout<<minotaurStartPosition.first<<' '<< minotaurStartPosition.second<<std::endl;
-    minotaur::Minotaur myMinotaur(textureLoader, glm::vec4(2.0f * minotaurStartPosition.first, -1.0f, 2.0f * minotaurStartPosition.second, 1.0f));
-    scene.AddObject("minotaur", &myMinotaur);
+    GameScene scene(textureLoader);
 
     engine::SetActiveScene(&scene);
 

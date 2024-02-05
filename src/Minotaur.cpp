@@ -192,3 +192,7 @@ std::pair<int, int> Minotaur::GetNextPosition()
 
     return {0, 0};
 }
+
+void Minotaur::SetPosition(glm::vec4 position) {
+    this->position = position;
+}

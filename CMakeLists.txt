@@ -24,6 +24,8 @@ set(SOURCES
   src/BezierCurve.cpp
   src/Minotaur.cpp
   src/SkyBox.cpp
+  src/GameScene.cpp
+  src/MenuScene.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)
