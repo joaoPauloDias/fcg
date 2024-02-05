@@ -57,6 +57,8 @@
 #include "TextureLoader.h"
 #include "VirtualScene.h"
 #include "GameScene.h"
+#include "MenuScene.h"
+
 
 
 // Variáveis que definem um programa de GPU (shaders). Veja função LoadShadersFromFiles().
@@ -124,9 +126,10 @@ int main(int argc, char *argv[])
     }
 
     GameScene scene(textureLoader);
+    MenuScene menu(textureLoader);
 
-    engine::SetActiveScene(&scene);
-
+    //engine::SetActiveScene(&scene);
+    engine::SetActiveScene(&menu);
     engine::Run(window);
 
     // Fim do programa

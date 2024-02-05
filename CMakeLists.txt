@@ -26,6 +26,7 @@ set(SOURCES
   src/SkyBox.cpp
   src/GameScene.cpp
   src/MenuScene.cpp
+  src/Plane.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

@@ -15,6 +15,7 @@ SkyBox::SkyBox(texture::TextureLoader textureLoader, Camera* camera) :
 
 
     sphereModel.GetPart("the_sphere")->setTextures(textureLoader.GetTexture("skybox_diffuse"), NULL, NULL);
+    sphereModel.GetPart("the_sphere")->id = 0;
     std::cout << sphereModel.GetPart("the_sphere")->id << std::endl;
 
     wingsModel.GetPart("wings")->setTextures(textureLoader.GetTexture("wings_diffuse"), NULL, NULL);

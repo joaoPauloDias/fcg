@@ -102,8 +102,8 @@ void Maze::Render() {
 }
 
 void Maze::Update(float dt) {
-    theseus::Theseus* theseus =  dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"));
-    getMazeIndex(theseus->getPosition());
+    //theseus::Theseus* theseus =  dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"));
+    //getMazeIndex(theseus->getPosition());
     //std::cout << "Updating maze\n";
 }
 
