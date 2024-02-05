@@ -86,6 +86,7 @@ void Minotaur::Update(float dt)
         position.x += nextDirection.first*dt*velocity;
         position.z += nextDirection.second*dt*velocity;
     }else{
+        theseus->GetHit(attackDamage);
         std::cout<<"MINOHIT "<< auxCount++<<std::endl;
     }
 
@@ -110,7 +111,7 @@ void Minotaur::Render()
     glEnable(GL_CULL_FACE);
 }
 
-void Minotaur::ReceiveHit(int damage)
+void Minotaur::GetHit(int damage)
 {
     health -= damage;
     damageAnimation = true;

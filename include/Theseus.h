@@ -27,7 +27,8 @@ namespace theseus
         collisions::Sphere hitBox;
         glm::mat4 swordModelMatrix;
         glm::mat4 shieldModelMatrix;
-
+        int health;
+        int attackDamage = 1;
         int attackStatus = ATTACK_AVAILABLE;
         float attackTime = 0.0f;
         bool inflictedDamage = false;
@@ -53,6 +54,7 @@ namespace theseus
         void DefenseCooldown(float dt, float &t);
         void DefenseActive(float dt, float &t);
         void CheckMinotaurInteraction(float dt);
+        void GetHit(int damage);
         glm::vec4 getNewPosition(float dt, bool update_x, bool update_y,
                                  bool update_z);
         void HandlePlayerMovement(float dt);

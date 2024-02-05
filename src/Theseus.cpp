@@ -41,6 +41,7 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
     position = glm::vec4(2.0f, 0.5f, 2.0f, 1.0f);
     hitBox.center = position;
+    health = 150;
     hitBox.radius = CAMERA_RADIUS;
 }
 
@@ -59,6 +60,8 @@ void Theseus::Render() {
 
 void Theseus::Update(float dt) {
     hitBox.center = position;
+
+    if(health<=0)activeScene = MENU_SCENE;
 
     float t = 0;
     switch (attackStatus) {
@@ -183,6 +186,11 @@ void theseus::Theseus::AttackCooldown(float dt, float& t) {
     }
 }
 
+void theseus::Theseus::GetHit(int damage){
+    if(defenseStatus != DEFENSE_ACTIVE)health-=damage;
+}
+
+
 void theseus::Theseus::CheckMinotaurInteraction(float dt) {
     minotaur::Minotaur* minotaur = (minotaur::Minotaur*) GetVirtualScene()->GetObject("minotaur");
 
@@ -195,13 +203,12 @@ void theseus::Theseus::CheckMinotaurInteraction(float dt) {
     collisions::Cylinder minotaurHitbox = minotaur->getHitbox();
 
     if (attackStatus == ATTACK_ACTIVE && !inflictedDamage && collisions::checkCollision(minotaurHitbox, swordTip)) {
-        minotaur->ReceiveHit(1);
+        minotaur->GetHit(attackDamage);
         inflictedDamage = true;
     }
 
     if (defenseStatus == DEFENSE_ACTIVE)
         return;
-    maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
 
     if (collisions::checkCollision(minotaurHitbox, getHitBox())) {
         glm::vec4 knockbackDirection = (position - minotaurHitbox.center)/norm(position - minotaurHitbox.center);

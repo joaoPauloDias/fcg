@@ -131,8 +131,8 @@ int main(int argc, char *argv[])
 
     GameScene game(textureLoader);
     MenuScene menu(textureLoader);
+    activeScene = MENU_SCENE;
 
-    engine::SetActiveScene(&menu);
     engine::Run(window, [&](){
         switch (activeScene) {
         case MENU_SCENE:

@@ -13,6 +13,7 @@ namespace minotaur {
             ObjModel model;
             collisions::Cylinder hitBox;
             int health;
+            int attackDamage = 1;
             float velocity;
             std::pair<int, int> nextDirection = {0, 0};
             std::default_random_engine randomGenerator_;
@@ -26,7 +27,7 @@ namespace minotaur {
             collisions::Cylinder getHitbox();
             std::pair<int, int> GetNextPosition();
             void SetPosition(glm::vec4 position);
-            void ReceiveHit(int damage);
+            void GetHit(int damage);
             void Render();
             void Update(float dt);
     };
