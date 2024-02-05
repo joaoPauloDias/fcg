@@ -40,7 +40,11 @@ diffuse = "../../assets/textures/shield_diffuse.png"
 [textures.plane]
 diffuse = "../../assets/textures/title_art.png"
 
+[textures.game_over]
+diffuse = "../../assets/textures/end_art.png"
 
+[textures.victory]
+diffuse = "../../assets/textures/victory_art.png"
 
 [shaders]
 vertex = "../../assets/shaders/shader_vertex.glsl"
