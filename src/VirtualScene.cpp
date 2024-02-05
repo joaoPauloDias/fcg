@@ -9,11 +9,7 @@ void VirtualScene::RenderScene() {
 }
 
 void VirtualScene::UpdateScene(float dt) {
-    if (freeCamera != nullptr)
-        freeCamera->update(dt);
-    else if (lookAtCamera != nullptr)
-        lookAtCamera->update(dt);
-
+    camera->update(dt);
     for (auto &&[name, object]: objects) {
         std::cout << name << std::endl;
         object->Update(dt);
@@ -37,10 +33,6 @@ void VirtualScene::RemoveObject(std::string name) {
     objects.erase(name);
 }
 
-void VirtualScene::SetCamera(FreeCamera* camera) {
-    freeCamera = camera;
-}
-
-void VirtualScene::SetCamera(LookAtCamera* camera) {
-    lookAtCamera = camera;
+void VirtualScene::SetCamera(Camera* camera) {
+    this->camera = camera;
 }

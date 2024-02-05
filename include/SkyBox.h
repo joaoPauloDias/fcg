@@ -11,14 +11,14 @@ class SkyBox : public GameObject {
     private:
         ObjModel sphereModel;
         ObjModel wingsModel;
-        FreeCamera* camera;
+        Camera* camera;
         glm::mat4 modelMatrix;
         glm::vec4 wingsPosition;
         float t = 0;
         bool showIcarus = false;
 
     public:
-        SkyBox(texture::TextureLoader textureLoader, FreeCamera* camera);
+        SkyBox(texture::TextureLoader textureLoader, Camera* camera);
         void Render();
         void Update(float dt);
 };

@@ -202,7 +202,7 @@ namespace engine
         float dx = xpos - g_LastCursorPosX;
         float dy = ypos - g_LastCursorPosY;
 
-        activeScene->GetFreeCamera()->handleCursor(dx, dy);
+        activeScene->GetCamera()->handleCursor(dx, dy);
 
         g_LastCursorPosX = xpos;
         g_LastCursorPosY = ypos;
@@ -211,7 +211,7 @@ namespace engine
     // Função callback chamada sempre que o usuário movimenta a "rodinha" do mouse.
     void ScrollCallback(GLFWwindow *window, double xoffset, double yoffset)
     {
-        activeScene->GetFreeCamera()->handleScroll(xoffset, yoffset);
+        activeScene->GetCamera()->handleScroll(xoffset, yoffset);
     }
 
     // Definição da função que será chamada sempre que o usuário pressionar alguma
@@ -222,7 +222,7 @@ namespace engine
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
             glfwSetWindowShouldClose(window, GL_TRUE);
 
-        activeScene->GetFreeCamera()->handleKey(key, scancode, action, mod);
+        activeScene->GetCamera()->handleKey(key, scancode, action, mod);
 
         // Se o usuário apertar a tecla H, fazemos um "toggle" do texto informativo mostrado na tela.
         if (key == GLFW_KEY_H && action == GLFW_PRESS)
