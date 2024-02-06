@@ -135,7 +135,14 @@ int main(int argc, char *argv[])
     MenuScene menu(textureLoader);
     activeScene = MENU_SCENE;
 
+
+    Sound* ambiance = AudioManager::makeSound("../../assets/audio/dungeon.mp3", false, 0.2);
+
     engine::Run(window, [&](){
+
+        if (!AudioManager::isSoundPlaying(ambiance))
+            AudioManager::playSound(ambiance);
+        
         switch (activeScene) {
         case MENU_SCENE:
             return (VirtualScene*)&menu;
