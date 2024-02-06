@@ -65,7 +65,7 @@ namespace engine
 
         // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
         // de pixels, e com título "INF01047 ...".
-        GLFWwindow *window = glfwCreateWindow(800, 600, "Tower Defense", NULL, NULL);
+        GLFWwindow *window = glfwCreateWindow(800, 600, "Maze of The Beast", NULL, NULL);
         if (!window)
         {
             glfwTerminate();
@@ -81,7 +81,7 @@ namespace engine
         // Indicamos que as chamadas OpenGL deverão renderizar nesta janela
         glfwMakeContextCurrent(window);
 
-        //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         // Carregamento de todas funções definidas por OpenGL 3.3, utilizando a
         // biblioteca GLAD.
         gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);

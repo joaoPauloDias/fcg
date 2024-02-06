@@ -8,7 +8,7 @@
 // After defining MINIAUDIO_IMPLEMENTATION, include miniaudio.h and you're good to go.
 #define MINIAUDIO_IMPLEMENTATION
 #define strcasecmp strcmp // Hack to make miniaudio compile on windows
-#include <miniaudio.h>
+#include <miniaudio/miniaudio.h>
 
 static ma_engine engine;
 
