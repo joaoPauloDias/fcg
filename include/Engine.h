@@ -5,6 +5,7 @@
 #include "Camera.h"
 #include "VirtualScene.h"
 #include <functional>
+#include "AudioManager.h"
 
 enum class GameState {
     THESEU,
