@@ -35,10 +35,10 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     : swordModel("../../assets/models/sword.obj"), 
       shieldModel("../../assets/models/shield.obj"),
       freeCamera(camera),
-      sword(AudioManager::makeSound("../../assets/audio/sword.wav", false, 1.0)),
-      step(AudioManager::makeSound("../../assets/audio/step.wav", false, 0.2)),
-      hurt(AudioManager::makeSound("../../assets/audio/hurt.wav", false, 1.0)),
-      shield(AudioManager::makeSound("../../assets/audio/shield.wav", false, 1.0))
+      sword(AudioManager::makeSound("../../assets/audio/sword.wav", false, 0.4)),
+      step(AudioManager::makeSound("../../assets/audio/step.wav", false, 0.1)),
+      hurt(AudioManager::makeSound("../../assets/audio/hurt.wav", false, 0.8)),
+      shield(AudioManager::makeSound("../../assets/audio/shield.wav", false, 0.6))
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);

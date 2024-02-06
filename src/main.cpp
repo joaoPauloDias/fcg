@@ -136,7 +136,7 @@ int main(int argc, char *argv[])
     activeScene = MENU_SCENE;
 
 
-    Sound* ambiance = AudioManager::makeSound("../../assets/audio/dungeon.mp3", false, 0.2);
+    Sound* ambiance = AudioManager::makeSound("../../assets/audio/dungeon.mp3", false, 0.15);
 
     engine::Run(window, [&](){
 

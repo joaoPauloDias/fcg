@@ -141,7 +141,7 @@ void Minotaur::GetHit(int damage)
 
 void Minotaur::UpdateSounds()
 {
-    float soundVolume = 1.0 / std::max(1.0f, distance);
+    float soundVolume = 0.2 / std::max(1.0f, distance);
     AudioManager::setSoundVolume(roar, soundVolume);
     AudioManager::setSoundVolume(hit, soundVolume);
     AudioManager::setSoundVolume(death, soundVolume);
