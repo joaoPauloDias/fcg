@@ -20,7 +20,7 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
 {
     this->position = position;
     this->textureLoader = textureLoader;
-    health = 1;
+    health = 5;
     velocity = 2.0f;
     distance = MAXFLOAT;
     randomGenerator_ = std::default_random_engine{};

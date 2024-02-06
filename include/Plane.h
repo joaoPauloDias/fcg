@@ -1,5 +1,6 @@
 #pragma once
 
+#include "AudioManager.h"
 #include "GameObject.h"
 #include "glm/vec4.hpp"
 #include "ObjModel.h"
@@ -15,6 +16,9 @@ namespace plane {
             ObjModel model;
             texture::TextureLoader textureLoader;
             Camera *camera;
+            Sound* laugh;
+            Sound* win;
+
 
         public:
             Plane(texture::TextureLoader textureLoader, glm::vec4 position, Camera *camera);
