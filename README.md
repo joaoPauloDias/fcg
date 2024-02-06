@@ -39,6 +39,8 @@ A seguir apresentamos as principais classes do projeto e suas responsabilidades:
 
 - **TextureLoader:** Carrega e gerencia as texturas da aplicação. As texturas são lidas do arquivo de configuração `settings.toml`.
 
+- **AudioManager:** Carrega e gerencia a execução dos arquivos de áudio da aplicação.
+
 ## Contribuições para o trabalho
 
 - **Diego Cardoso Nunes:** Setup inicial do projeto; Carregamento e mapeamento de texturas; Implementação dos shaders, com os modelos de iluminação de Blinn-Phong e Diffusa, e os modelo de interpolação de Gouraud e de Phong; SkyBox; Movimentação com Curva de Bézier cúbica; Animações de ataque da espada e de defesa do escudo, com transformações geométricas controladas pelo usuário; colisão do ataque (Ponto x Cilindro).
