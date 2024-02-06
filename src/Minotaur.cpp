@@ -8,19 +8,21 @@
 #include "Theseus.h"
 #include "collisions.h"
 
-
 using namespace minotaur;
 
 #define SCALE_FACTOR 0.018f
 
-int auxCount = 0;
-
-Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj")
+Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj"),
+                                                                               roar(AudioManager::makeSound("../../assets/audio/minotaur_roar.mp3", false, 1.0)),
+                                                                               step(AudioManager::makeSound("../../assets/audio/minotaur_steps.mp3", false, 1.0)),
+                                                                               hit(AudioManager::makeSound("../../assets/audio/minotaur_hit.mp3", false, 1.0)),
+                                                                               death(AudioManager::makeSound("../../assets/audio/minotaur_death.wav", false, 1.0))
 {
     this->position = position;
     this->textureLoader = textureLoader;
-    health = 5;
+    health = 1;
     velocity = 2.0f;
+    distance = MAXFLOAT;
     randomGenerator_ = std::default_random_engine{};
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
@@ -47,22 +49,27 @@ collisions::Cylinder Minotaur::getHitbox()
 void Minotaur::Update(float dt)
 {
     if (health <= 0)
-    {
-        std::cout << "Minotauro morreu\n"
-                  << std::endl;
+    {   
+        if (!AudioManager::isSoundPlaying(this->death))
+            AudioManager::playSound(this->death);
         GetVirtualScene()->RemoveObject("minotaur");
         activeScene = MENU_SCENE;
         activeMenu = VICTORY;
         return;
     }
 
-    if (damageAnimationTime < 1) {
+    if (damageAnimationTime < 1)
+    {
         damageAnimationTime += dt;
-    } else {
+    }
+    else
+    {
         damageAnimation = false;
         damageAnimationTime = 0;
         model.GetPart("Body_mesh")->setTextures(textureLoader.GetTexture("minotaur_diffuse"), textureLoader.GetTexture("minotaur_specular"), textureLoader.GetTexture("minotaur_normals"));
     }
+
+    UpdateSounds();
 
     float pos_x = position.x / 2.0f;
     float pos_z = position.z / 2.0f;
@@ -73,34 +80,43 @@ void Minotaur::Update(float dt)
     bool center_x = std::abs(pos_x - grid_x) <= 1e-2;
     bool center_z = std::abs(pos_z - grid_z) <= 1e-2;
 
-    if (center_x && center_z) {
+    if (center_x && center_z)
+    {
         nextDirection = GetNextPosition();
     }
 
     // Orientation towards Theseus
-    theseus::Theseus* theseus = dynamic_cast<theseus::Theseus*>(GetVirtualScene()->GetObject("theseus"));
+    theseus::Theseus *theseus = dynamic_cast<theseus::Theseus *>(GetVirtualScene()->GetObject("theseus"));
     glm::vec4 theseusPosition = theseus->getPosition();
-    glm::vec4 directionToTheseus = (theseusPosition - position)/norm(theseusPosition - position);
+    glm::vec4 directionToTheseus = (theseusPosition - position) / norm(theseusPosition - position);
     float angleToTheseus = atan2(directionToTheseus.x, directionToTheseus.z);
 
     // collision with theseus
-    if(!collisions::checkCollision(getHitbox(), theseus->getHitBox())){
-        position.x += nextDirection.first*dt*velocity;
-        position.z += nextDirection.second*dt*velocity;
-    }else{
-        theseus->GetHit(attackDamage);
-        std::cout<<"MINOHIT "<< auxCount++<<std::endl;
+    if (!collisions::checkCollision(getHitbox(), theseus->getHitBox()))
+    {
+        position.x += nextDirection.first * dt * velocity;
+        position.z += nextDirection.second * dt * velocity;
+        if (!AudioManager::isSoundPlaying(this->step))
+            AudioManager::playSound(this->step);
     }
+    else
+    {
 
+        theseus->GetHit(attackDamage);
+        if (!AudioManager::isSoundPlaying(this->roar))
+            AudioManager::playSound(this->roar);
+    }
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
                   Matrix_Rotate_Y(angleToTheseus) *
                   Matrix_Scale(SCALE_FACTOR, SCALE_FACTOR, SCALE_FACTOR);
-    
-    if (damageAnimation) {
+
+    if (damageAnimation)
+    {
+        if (!AudioManager::isSoundPlaying(this->hit))
+            AudioManager::playSound(this->hit);
         modelMatrix = Matrix_Translate(0.0f, 0.1f * damageAnimationTime, 0.0f) * modelMatrix;
     }
-
 }
 
 void Minotaur::Render()
@@ -117,9 +133,17 @@ void Minotaur::GetHit(int damage)
 {
     health -= damage;
     damageAnimation = true;
-    model.GetPart("Body_mesh")->setTextures(
-        textureLoader.GetTexture("minotaur_damage"), NULL, NULL);
+    model.GetPart("Body_mesh")->setTextures(textureLoader.GetTexture("minotaur_damage"), NULL, NULL);
     std::cout << "ouch\n";
+}
+
+void Minotaur::UpdateSounds()
+{
+    float soundVolume = 1.0 / std::max(1.0f, distance);
+    AudioManager::setSoundVolume(roar, soundVolume);
+    AudioManager::setSoundVolume(hit, soundVolume);
+    AudioManager::setSoundVolume(death, soundVolume);
+    AudioManager::setSoundVolume(step, soundVolume);
 }
 
 std::pair<int, int> Minotaur::GetNextPosition()
@@ -165,29 +189,36 @@ std::pair<int, int> Minotaur::GetNextPosition()
         atual = visited[atual.first][atual.second];
 
         // It is impossible to reach theseus
-        if (atual.first == -1) {
+        if (atual.first == -1)
+        {
             return {0, 0};
         }
         path.push_back(atual);
-
     }
 
+    if (path.size() > 1)
+        atual = path[path.size() - 2];
 
-    if(path.size()>1)atual = path[path.size()-2];
-    
-    if(abs(theseusPosition.first - minotaurPosition.first) + abs(theseusPosition.second - minotaurPosition.second) <= maxDistanceDetectable){
+    distance = abs(theseusPosition.first - minotaurPosition.first) + abs(theseusPosition.second - minotaurPosition.second);
+
+    if (distance <= maxDistanceDetectable)
+    {
         for (auto direction : directions)
         {
-            if (minotaurPosition.first + di[direction] == atual.first && minotaurPosition.second + dj[direction] == atual.second){
+            if (minotaurPosition.first + di[direction] == atual.first && minotaurPosition.second + dj[direction] == atual.second)
+            {
                 return {di[direction], dj[direction]};
             }
         }
-    }else{
+    }
+    else
+    {
         std::vector<int> newDirection = {0, 1, 2, 3};
         std::shuffle(std::begin(newDirection), std::end(newDirection), randomGenerator_);
         for (auto direction : newDirection)
         {
-            if (!walls[minotaurPosition.first + di[direction]][minotaurPosition.second + dj[direction]]){
+            if (!walls[minotaurPosition.first + di[direction]][minotaurPosition.second + dj[direction]])
+            {
                 return {di[direction], dj[direction]};
             }
         }
@@ -196,6 +227,7 @@ std::pair<int, int> Minotaur::GetNextPosition()
     return {0, 0};
 }
 
-void Minotaur::SetPosition(glm::vec4 position) {
+void Minotaur::SetPosition(glm::vec4 position)
+{
     this->position = position;
 }
