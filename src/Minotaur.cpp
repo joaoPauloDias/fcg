@@ -11,6 +11,8 @@
 using namespace minotaur;
 
 #define SCALE_FACTOR 0.018f
+#define MINOTAUR_HEALTH 8
+#define MINOTAUR_VELOCITY 2.0f
 
 Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj"),
                                                                                roar(AudioManager::makeSound("../../assets/audio/minotaur_roar.mp3", false, 1.0)),
@@ -20,8 +22,8 @@ Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : m
 {
     this->position = position;
     this->textureLoader = textureLoader;
-    health = 5;
-    velocity = 2.0f;
+    health = MINOTAUR_HEALTH;
+    velocity = MINOTAUR_VELOCITY;
     distance = MAXFLOAT;
     randomGenerator_ = std::default_random_engine{};
 
