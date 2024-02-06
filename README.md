@@ -50,7 +50,9 @@ A seguir apresentamos as principais classes do projeto e suas responsabilidades:
 - **Ambos:** Sistema de knockback do Minotauro; Mecanismo de sliding de objetos nas paredes do labirinto.
 
 ## Uso de ferramentas e referências externas
-Não utilizamos ferramentas baseadas em IA Generativa (ChatGPT, Copilot) para desenvolver este trabalho. Para a implementação de alguns testes de colisão, utilizamos as referências disponibilizadas pelo professor na página do Moodle da disciplina.
+Não utilizamos ferramentas baseadas em IA Generativa para implementar o código deste trabalho. O nome do jogo foi criado com auxílio do ChatGPT. Nesse processo, utilizamos prompts para fazer a IA gerar diversos nomes, com variados níveis de criatividade. A maior parte dos nomes não correspondia adequadamente ao propósito e aos elementos do jogo e foram considerados insatisfatórios. O melhor nome gerado foi o utilizado: "Maze of The Beast". Como uma ferramenta para impulsionar o pensamento criativo, a IA ofereceu um bom ponto de partida e motivação para o Brainstorming, entretanto ficou claro que é essencial realizar um processo de curadoria e filtragem sobre as sugestões geradas para garantir que elas fazem sentido e se adequam ao contexto do projeto.
+
+Para a implementação de alguns testes de colisão, utilizamos as referências disponibilizadas pelo professor na página do Moodle da disciplina.
 
 ## Processo de Desenvolvimento e Requisitos
 No desenvolvimento trabalhamos tanto de forma assíncrona quanto síncrona (pair programming) através de reuniões virtuais. Os conceitos de Computação Gráfica estudados e indicados nos requisitos foram utilizados nas seguintes partes da aplicação:
