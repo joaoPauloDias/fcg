@@ -3,7 +3,13 @@
 
 enum ActiveScene {
     MENU_SCENE,
-    GAME_SCENE
+    GAME_SCENE,
+};
+
+enum ActiveMenu {
+    MENU,
+    GAME_OVER,
+    VICTORY
 };
 
 extern GLuint g_GpuProgramID;
@@ -14,5 +20,6 @@ extern GLint g_object_id_uniform;
 extern GLint g_bbox_min_uniform;
 extern GLint g_bbox_max_uniform;
 extern ActiveScene activeScene;
+extern ActiveMenu activeMenu;
 
 

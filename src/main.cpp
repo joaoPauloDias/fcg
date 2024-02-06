@@ -73,6 +73,8 @@ GLint g_bbox_max_uniform;
 
 
 ActiveScene activeScene = MENU_SCENE;
+ActiveMenu activeMenu = MENU;
+
 
 
 // Declaração de funções utilizadas para pilha de matrizes de modelagem.

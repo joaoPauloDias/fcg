@@ -51,6 +51,8 @@ void Minotaur::Update(float dt)
         std::cout << "Minotauro morreu\n"
                   << std::endl;
         GetVirtualScene()->RemoveObject("minotaur");
+        activeScene = MENU_SCENE;
+        activeMenu = VICTORY;
         return;
     }
 

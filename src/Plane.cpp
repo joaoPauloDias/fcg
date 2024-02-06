@@ -5,7 +5,6 @@
 #define SCALE_FACTOR_X 3.3f * 0.5f
 #define SCALE_FACTOR_Z 1.0f * 0.5f
 
-extern ActiveScene activeScene;
 extern bool g_LeftMouseButtonPressed;
 using namespace plane;
 
@@ -39,7 +38,11 @@ void Plane::Update(float dt){
                   Matrix_Rotate_X(M_PI_2) *
                   Matrix_Scale(SCALE_FACTOR_X, 1.0f, SCALE_FACTOR_Z);
 
-    if (activeScene == MENU_SCENE && g_LeftMouseButtonPressed) {
+    if (activeScene == MENU_SCENE && activeMenu == MENU && g_LeftMouseButtonPressed) {
         activeScene = GAME_SCENE;
+    }else if(activeMenu == GAME_OVER){
+        model.GetPart("plane")->setTextures(textureLoader.GetTexture("game_over_diffuse"), NULL, NULL);
+    }else if(activeMenu == VICTORY){
+        model.GetPart("plane")->setTextures(textureLoader.GetTexture("victory_diffuse"), NULL, NULL);
     }
 }

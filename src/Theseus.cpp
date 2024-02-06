@@ -61,7 +61,11 @@ void Theseus::Render() {
 void Theseus::Update(float dt) {
     hitBox.center = position;
 
-    if(health<=0)activeScene = MENU_SCENE;
+    if(health<=0){
+        GetVirtualScene()->RemoveObject("theseus");
+        activeScene = MENU_SCENE;
+        activeMenu = GAME_OVER;
+    }
 
     float t = 0;
     switch (attackStatus) {
