@@ -34,8 +34,11 @@ extern bool dPressed;
 Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     : swordModel("../../assets/models/sword.obj"), 
       shieldModel("../../assets/models/shield.obj"),
-      freeCamera(camera)
-
+      freeCamera(camera),
+      sword(AudioManager::makeSound("../../assets/audio/sword.wav", false, 1.0)),
+      step(AudioManager::makeSound("../../assets/audio/step.wav", false, 0.2)),
+      hurt(AudioManager::makeSound("../../assets/audio/hurt.wav", false, 1.0)),
+      shield(AudioManager::makeSound("../../assets/audio/shield.wav", false, 1.0))
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
@@ -147,6 +150,10 @@ void theseus::Theseus::AttackActive(float dt, float& t) {
         attackTime = ATTACK_COOLDOWN_DURATION;
         attackStatus = ATTACK_IN_COOLDOWN;
     }
+
+    if (!AudioManager::isSoundPlaying(this->sword)) {
+        AudioManager::playSound(this->sword);
+    }
 }
 
 
@@ -191,7 +198,12 @@ void theseus::Theseus::AttackCooldown(float dt, float& t) {
 }
 
 void theseus::Theseus::GetHit(int damage){
-    if(defenseStatus != DEFENSE_ACTIVE)health-=damage;
+    if(defenseStatus != DEFENSE_ACTIVE){
+        health-=damage;
+        if (!AudioManager::isSoundPlaying(this->hurt)) 
+            AudioManager::playSound(this->hurt);
+    }else if(!AudioManager::isSoundPlaying(this->shield))
+        AudioManager::playSound(this->shield);
 }
 
 
@@ -230,7 +242,6 @@ void theseus::Theseus::CheckMinotaurInteraction(float dt) {
 void theseus::Theseus::SlideMovement(float dt, std::function<glm::vec4(bool, bool, float)> func) {
     std::pair<bool, bool> dirs[] = {{true, true}, {true, false}, {false, true}};
     maze::Maze* maze = (maze::Maze*) GetVirtualScene()->GetObject("maze");
-
     for (auto [update_x, update_z] : dirs) {
         collisions::Sphere newHitbox = hitBox;
 
@@ -249,7 +260,11 @@ void theseus::Theseus::HandlePlayerMovement(float dt) {
     SlideMovement(dt, [this](bool update_x, bool update_z, float dt){
         return getNewPosition(dt, update_x, FREE, update_z);
     });
-    freeCamera->position = position;
+    if(freeCamera->position != position){
+        freeCamera->position = position;
+        if (!AudioManager::isSoundPlaying(this->step))AudioManager::playSound(this->step);
+
+    }
 }
 
 glm::vec4 Theseus::getNewPosition(float dt, bool update_x, bool update_y, bool update_z) {

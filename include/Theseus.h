@@ -5,6 +5,7 @@
 #include "TextureLoader.h"
 #include "Camera.h"
 #include "collisions.h"
+#include "AudioManager.h"
 #include <functional>
 
 #define ATTACK_AVAILABLE 0
@@ -27,6 +28,10 @@ namespace theseus
         collisions::Sphere hitBox;
         glm::mat4 swordModelMatrix;
         glm::mat4 shieldModelMatrix;
+        Sound *sword;
+        Sound *shield;
+        Sound *step;
+        Sound *hurt;
         int health;
         int attackDamage = 1;
         int attackStatus = ATTACK_AVAILABLE;
