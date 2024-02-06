@@ -1,5 +1,7 @@
 # Maze of The Beast
 
+![Tela de início](assets/textures/title_art.png)
+
 Assuma o papel de Teseu e entre no labirinto de Dédalo para matar a terrível besta que lá está encarcerada.
 
 Este trabalho foi desenvolvido para a cadeira de Fundamentos de Computação Gráfica - 2023/2.
