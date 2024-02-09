@@ -7,30 +7,10 @@ namespace collisions
 {
     // FONTE: https://www.realtimerendering.com/intersections.html
     // FONTE: https://realtimecollisiondetection.net/books/rtcd/
-    // bool checkCollision(
-    //     const Sphere &sphere,
-    //     const glm::vec3 &bbox_min, const glm::vec3 &bbox_max, const glm::mat4 &modelMatrix)
-    // {
-    //     // Inverse transform the camera position
-    //     glm::vec4 transformedCenter = glm::inverse(modelMatrix) * sphere.center;
-
-    //     // Clamping the sphere's center to the closest point inside the cube
-    //     float clampedX = std::max(bbox_min.x, std::min(transformedCenter.x, bbox_max.x));
-    //     float clampedY = std::max(bbox_min.y, std::min(transformedCenter.y, bbox_max.y));
-    //     float clampedZ = std::max(bbox_min.z, std::min(transformedCenter.z, bbox_max.z));
-
-    //     // Calculate the distance between the sphere's center and this clamped point
-    //     glm::vec3 closestPointInCube = glm::vec3(clampedX, clampedY, clampedZ);
-    //     glm::vec3 sphereCenter = glm::vec3(transformedCenter);
-    //     float distanceSquared = glm::length(sphereCenter - closestPointInCube);
-
-    //     // Check if the distance is less than or equal to the radius
-    //     return distanceSquared <= sphere.radius;
-    // }
-
-    float SqDistPointAABB(const glm::vec3 &point, const glm::vec3 &bbox_min, const glm::vec3 &bbox_max)
+    float SqDistPointAABB(const glm::vec4 &point, const glm::vec4 &bbox_min, const glm::vec4 &bbox_max)
     {
         float sqDist = 0.0f;
+
         if (point.x < bbox_min.x)
             sqDist += (bbox_min.x - point.x) * (bbox_min.x - point.x);
         if (point.x > bbox_max.x)
@@ -45,15 +25,20 @@ namespace collisions
             sqDist += (bbox_min.z - point.z) * (bbox_min.z - point.z);
         if (point.z > bbox_max.z)
             sqDist += (point.z - bbox_max.z) * (point.z - bbox_max.z);
+            
         return sqDist;
     }
 
-    // Returns true if sphere s intersects AABB b, false otherwise
+    // FONTE: https://www.realtimerendering.com/intersections.html
+    // FONTE: https://realtimecollisiondetection.net/books/rtcd/
     bool checkCollision(const Sphere &sphere,
                         const glm::vec3 &bbox_min, const glm::vec3 &bbox_max, const glm::mat4 &modelMatrix)
     {
+        glm::vec4 minPoint = modelMatrix * glm::vec4(bbox_min, 1.0f);
+        glm::vec4 maxPoint = modelMatrix * glm::vec4(bbox_max, 1.0f);
+
         // Compute squared distance between sphere center and AABB
-        float sqDist = SqDistPointAABB(glm::vec3(sphere.center), bbox_min, bbox_max);
+        float sqDist = SqDistPointAABB(sphere.center, minPoint, maxPoint);
 
         // Sphere and AABB intersect if the (squared) distance
         // between them is less than the (squared) sphere radius
