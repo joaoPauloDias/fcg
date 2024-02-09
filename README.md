@@ -6,6 +6,8 @@ Assuma o papel de Teseu e entre no labirinto de Dédalo para matar a terrível b
 
 Este trabalho foi desenvolvido para a cadeira de Fundamentos de Computação Gráfica - 2023/2.
 
+[Vídeo no YouTube](https://youtu.be/_OU3etGP900)
+
 
 ## Tecnologias e Bibliotecas Utilizadas
 - OpenGL
@@ -83,7 +85,7 @@ No desenvolvimento trabalhamos tanto de forma assíncrona quanto síncrona (pair
 ![Vitória](images/image-4.png)
 
 ## Manual da aplicação
-Na tela inicial, clique com o botão esquerdo para entrar no jogo. O personagem é movimentado com WASD e a câmera é controlada pela movimentação do mouse. Ataque com o botão esquerdo do mouse e use o escudo com o botão direito.
+Na tela inicial, clique com o botão esquerdo para entrar no jogo. O personagem é movimentado com WASD e a câmera é controlada pela movimentação do mouse. Ataque com o botão esquerdo do mouse e use o escudo com o botão direito. Para alternar entre o modo de janela e de tela cheia, use F1.
 
 ## Compilação e Execução da Aplicação
 
