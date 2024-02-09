@@ -73,7 +73,7 @@ namespace engine
             std::exit(EXIT_FAILURE);
         }
 
-        AudioManager::init();
+        SoundPlayer::init();
 
         // Definimos o callback para impressão de erros da GLFW no terminal
         glfwSetErrorCallback(ErrorCallback);

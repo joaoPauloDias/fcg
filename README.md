@@ -39,7 +39,7 @@ A seguir apresentamos as principais classes do projeto e suas responsabilidades:
 
 - **TextureLoader:** Carrega e gerencia as texturas da aplicação. As texturas são lidas do arquivo de configuração `settings.toml`.
 
-- **AudioManager:** Carrega e gerencia a execução dos arquivos de áudio da aplicação.
+- **SoundPlayer:** Carrega e gerencia a execução dos arquivos de áudio da aplicação.
 
 ## Contribuições para o trabalho
 

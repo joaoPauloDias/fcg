@@ -1,5 +1,5 @@
 #include "GameObject.h"
-#include "AudioManager.h"
+#include "SoundPlayer.h"
 #include "glm/vec4.hpp"
 #include "ObjModel.h"
 #include "TextureLoader.h"

@@ -15,10 +15,10 @@ using namespace minotaur;
 #define MINOTAUR_VELOCITY 2.0f
 
 Minotaur::Minotaur(texture::TextureLoader textureLoader, glm::vec4 position) : model("../../assets/models/minotaur.obj"),
-                                                                               roar(AudioManager::makeSound("../../assets/audio/minotaur_roar.mp3", false, 1.0)),
-                                                                               step(AudioManager::makeSound("../../assets/audio/minotaur_steps.mp3", false, 1.0)),
-                                                                               hit(AudioManager::makeSound("../../assets/audio/minotaur_hit.mp3", false, 1.0)),
-                                                                               death(AudioManager::makeSound("../../assets/audio/minotaur_death.wav", false, 1.0))
+                                                                               roar(SoundPlayer::initSound("../../assets/audio/minotaur_roar.mp3", false, 1.0)),
+                                                                               step(SoundPlayer::initSound("../../assets/audio/minotaur_steps.mp3", false, 1.0)),
+                                                                               hit(SoundPlayer::initSound("../../assets/audio/minotaur_hit.mp3", false, 1.0)),
+                                                                               death(SoundPlayer::initSound("../../assets/audio/minotaur_death.wav", false, 1.0))
 {
     this->position = position;
     this->textureLoader = textureLoader;
@@ -52,8 +52,8 @@ void Minotaur::Update(float dt)
 {
     if (health <= 0)
     {   
-        if (!AudioManager::isSoundPlaying(this->death))
-            AudioManager::playSound(this->death);
+        if (!SoundPlayer::isPlaying(this->death))
+            SoundPlayer::playSound(this->death);
         GetVirtualScene()->RemoveObject("minotaur");
         activeScene = MENU_SCENE;
         activeMenu = VICTORY;
@@ -98,15 +98,15 @@ void Minotaur::Update(float dt)
     {
         position.x += nextDirection.first * dt * velocity;
         position.z += nextDirection.second * dt * velocity;
-        if (!AudioManager::isSoundPlaying(this->step))
-            AudioManager::playSound(this->step);
+        if (!SoundPlayer::isPlaying(this->step))
+            SoundPlayer::playSound(this->step);
     }
     else
     {
 
         theseus->GetHit(attackDamage);
-        if (!AudioManager::isSoundPlaying(this->roar))
-            AudioManager::playSound(this->roar);
+        if (!SoundPlayer::isPlaying(this->roar))
+            SoundPlayer::playSound(this->roar);
     }
 
     modelMatrix = Matrix_Translate(position.x, position.y, position.z) *
@@ -115,8 +115,8 @@ void Minotaur::Update(float dt)
 
     if (damageAnimation)
     {
-        if (!AudioManager::isSoundPlaying(this->hit))
-            AudioManager::playSound(this->hit);
+        if (!SoundPlayer::isPlaying(this->hit))
+            SoundPlayer::playSound(this->hit);
         modelMatrix = Matrix_Translate(0.0f, 0.1f * damageAnimationTime, 0.0f) * modelMatrix;
     }
 }
@@ -142,10 +142,10 @@ void Minotaur::GetHit(int damage)
 void Minotaur::UpdateSounds()
 {
     float soundVolume = 0.2 / std::max(1.0f, distance);
-    AudioManager::setSoundVolume(roar, soundVolume);
-    AudioManager::setSoundVolume(hit, soundVolume);
-    AudioManager::setSoundVolume(death, soundVolume);
-    AudioManager::setSoundVolume(step, soundVolume);
+    SoundPlayer::setVolume(roar, soundVolume);
+    SoundPlayer::setVolume(hit, soundVolume);
+    SoundPlayer::setVolume(death, soundVolume);
+    SoundPlayer::setVolume(step, soundVolume);
 }
 
 std::pair<int, int> Minotaur::GetNextPosition()

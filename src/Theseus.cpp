@@ -35,10 +35,10 @@ Theseus::Theseus(texture::TextureLoader textureLoader, FreeCamera* camera)
     : swordModel("../../assets/models/sword.obj"), 
       shieldModel("../../assets/models/shield.obj"),
       freeCamera(camera),
-      sword(AudioManager::makeSound("../../assets/audio/sword.wav", false, 0.4)),
-      step(AudioManager::makeSound("../../assets/audio/step.wav", false, 0.1)),
-      hurt(AudioManager::makeSound("../../assets/audio/hurt.wav", false, 0.8)),
-      shield(AudioManager::makeSound("../../assets/audio/shield.wav", false, 0.6))
+      sword(SoundPlayer::initSound("../../assets/audio/sword.wav", false, 0.4)),
+      step(SoundPlayer::initSound("../../assets/audio/step.wav", false, 0.1)),
+      hurt(SoundPlayer::initSound("../../assets/audio/hurt.wav", false, 0.8)),
+      shield(SoundPlayer::initSound("../../assets/audio/shield.wav", false, 0.6))
 {
     swordModel.GetPart("sword")->setTextures(textureLoader.GetTexture("sword_diffuse"),NULL,NULL);
     shieldModel.GetPart("shield")->setTextures(textureLoader.GetTexture("shield_diffuse"),NULL,NULL);
@@ -151,8 +151,8 @@ void theseus::Theseus::AttackActive(float dt, float& t) {
         attackStatus = ATTACK_IN_COOLDOWN;
     }
 
-    if (!AudioManager::isSoundPlaying(this->sword)) {
-        AudioManager::playSound(this->sword);
+    if (!SoundPlayer::isPlaying(this->sword)) {
+        SoundPlayer::playSound(this->sword);
     }
 }
 
@@ -200,10 +200,10 @@ void theseus::Theseus::AttackCooldown(float dt, float& t) {
 void theseus::Theseus::GetHit(int damage){
     if(defenseStatus != DEFENSE_ACTIVE){
         health-=damage;
-        if (!AudioManager::isSoundPlaying(this->hurt)) 
-            AudioManager::playSound(this->hurt);
-    }else if(!AudioManager::isSoundPlaying(this->shield))
-        AudioManager::playSound(this->shield);
+        if (!SoundPlayer::isPlaying(this->hurt)) 
+            SoundPlayer::playSound(this->hurt);
+    }else if(!SoundPlayer::isPlaying(this->shield))
+        SoundPlayer::playSound(this->shield);
 }
 
 
@@ -262,7 +262,7 @@ void theseus::Theseus::HandlePlayerMovement(float dt) {
     });
     if(freeCamera->position != position){
         freeCamera->position = position;
-        if (!AudioManager::isSoundPlaying(this->step))AudioManager::playSound(this->step);
+        if (!SoundPlayer::isPlaying(this->step))SoundPlayer::playSound(this->step);
 
     }
 }

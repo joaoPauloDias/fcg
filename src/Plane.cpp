@@ -10,8 +10,8 @@ using namespace plane;
 
 Plane::Plane(texture::TextureLoader textureLoader, glm::vec4 position, Camera *camera) : 
         model("../../assets/models/plane.obj"),
-        laugh(AudioManager::makeSound("../../assets/audio/laugh.mp3", false, 1.0)),
-        win(AudioManager::makeSound("../../assets/audio/congratulations.mp3", false, 1.0))
+        laugh(SoundPlayer::initSound("../../assets/audio/laugh.mp3", false, 1.0)),
+        win(SoundPlayer::initSound("../../assets/audio/congratulations.mp3", false, 1.0))
 {
     this->position = position;
     this->textureLoader = textureLoader;
@@ -44,12 +44,12 @@ void Plane::Update(float dt){
     if (activeScene == MENU_SCENE && activeMenu == MENU && g_LeftMouseButtonPressed) {
         activeScene = GAME_SCENE;
     }else if(activeMenu == GAME_OVER){
-        if (!AudioManager::isSoundPlaying(this->laugh))
-            AudioManager::playSound(this->laugh);
+        if (!SoundPlayer::isPlaying(this->laugh))
+            SoundPlayer::playSound(this->laugh);
         model.GetPart("plane")->setTextures(textureLoader.GetTexture("game_over_diffuse"), NULL, NULL);
     }else if(activeMenu == VICTORY){
-        if (!AudioManager::isSoundPlaying(this->win))
-            AudioManager::playSound(this->win);
+        if (!SoundPlayer::isPlaying(this->win))
+            SoundPlayer::playSound(this->win);
         model.GetPart("plane")->setTextures(textureLoader.GetTexture("victory_diffuse"), NULL, NULL);
     }
 }

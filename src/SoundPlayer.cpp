@@ -1,4 +1,4 @@
-#include "AudioManager.h"
+#include "SoundPlayer.h"
 
 #include <cstdlib>
 #include <cstdio>
@@ -18,7 +18,7 @@ struct Sound {
   ma_sound sound;
 };
 
-Sound* AudioManager::makeSound(const char* fname, bool loop, float volume, bool stream) {
+Sound* SoundPlayer::initSound(const char* fname, bool loop, float volume, bool stream) {
   Sound* s = (Sound*)malloc(sizeof(Sound));
   if (stream) {
     ma_sound_init_from_file(&engine, fname, MA_SOUND_FLAG_STREAM, NULL, NULL, &s->sound);
@@ -30,12 +30,8 @@ Sound* AudioManager::makeSound(const char* fname, bool loop, float volume, bool 
   return s;
 }
 
-void AudioManager::destroySound(Sound* s) {
-  ma_sound_uninit(&s->sound);
-  free(s);
-}
 
-void AudioManager::init() {
+void SoundPlayer::init() {
   ma_result result;
   result = ma_engine_init(NULL, &engine);
   if (result != MA_SUCCESS) {
@@ -44,22 +40,14 @@ void AudioManager::init() {
   }
 }
 
-void AudioManager::destroy() {
-  ma_engine_uninit(&engine);
-}
-
-void AudioManager::setSoundVolume(Sound *s, float volume) {
+void SoundPlayer::setVolume(Sound *s, float volume) {
   ma_sound_set_volume(&s->sound, volume);
 }
 
-void AudioManager::playSound(Sound *s) {
+void SoundPlayer::playSound(Sound *s) {
   ma_sound_start(&s->sound);
 }
 
-void AudioManager::stopSound(Sound *s) {
-  ma_sound_stop(&s->sound);
-}
-
-bool AudioManager::isSoundPlaying(Sound* s) {
+bool SoundPlayer::isPlaying(Sound* s) {
   return ma_sound_is_playing(&s->sound);
 }
