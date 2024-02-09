@@ -10,6 +10,7 @@ layout (location = 2) in vec2 texture_coefficients;
 uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
+uniform bool applyInverseView;
 
 uniform int object_id;
 
@@ -48,8 +49,13 @@ void main()
     // deste Vertex Shader, a placa de vídeo (GPU) fará a divisão por W. Veja
     // slides 41-67 e 69-86 do documento Aula_09_Projecoes.pdf.
 
-    gl_Position = projection * view * model * model_coefficients;
+    mat4 realModel = model;
+    if (applyInverseView) {
+        realModel = inverse(view) * model;
+    }
 
+    gl_Position = projection * view * realModel * model_coefficients;
+    
     // Como as variáveis acima  (tipo vec4) são vetores com 4 coeficientes,
     // também é possível acessar e modificar cada coeficiente de maneira
     // independente. Esses são indexados pelos nomes x, y, z, e w (nessa
@@ -65,14 +71,14 @@ void main()
     // rasterizador para gerar atributos únicos para cada fragmento gerado.
 
     // Posição do vérticespecular_gouraud atual no sistema de coordenadas global (World).
-    position_world = model * model_coefficients;
+    position_world = realModel * model_coefficients;
 
     // Posição do vértice atual no sistema de coordenadas local do modelo.
     position_model = model_coefficients;
 
     // Normal do vértice atual no sistema de coordenadas global (World).
     // Veja slides 123-151 do documento Aula_07_Transformacoes_Geometricas_3D.pdf.
-    normal = inverse(transpose(model)) * normal_coefficients;
+    normal = inverse(transpose(realModel)) * normal_coefficients;
     normal.w = 0.0;
 
     // Coordenadas de textura obtidas do arquivo OBJ (se existirem!)
@@ -86,11 +92,12 @@ void main()
         vec4 v = normalize(camera_position - p);
         vec4 r = normalize(-l + 2 * normal * dot(normal, l));
         float lambert = max(0,dot(normal,l));
-        float specular = pow(max(0, dot(r, v)), 40);
+        float specular = pow(max(0, dot(r, v)), 100);
 
-        gouraud = vec3(1, 1, 1) * (lambert + 0.1);
-        if (illumination == BLINN_PHONG) {
-            gouraud = gouraud + vec3(0.8, 0.8, 0.8) * specular;
+        if (illumination == DIFFUSE) {
+            gouraud = vec3(1, 1, 1) * (lambert + 0.1);
+        } else if (illumination == BLINN_PHONG) {
+            gouraud = vec3(1, 1, 1) * (lambert + specular + 0.3);
         }
     }
 }

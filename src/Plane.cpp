@@ -27,17 +27,16 @@ Plane::Plane(texture::TextureLoader textureLoader, glm::vec4 position, Camera *c
 void Plane::Render(){
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "illumination"), ILLUMINATION_BLINN_PHONG);
     glUniform1i(glGetUniformLocation(g_GpuProgramID, "interpolation"), INTERPOLATION_PHONG);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "applyInverseView"), true);
     model.ApplyModelMatrix(modelMatrix);
     glDisable(GL_CULL_FACE);
     model.Draw();
     glEnable(GL_CULL_FACE);
+    glUniform1i(glGetUniformLocation(g_GpuProgramID, "applyInverseView"), false);
 }
 
 void Plane::Update(float dt){
-    glm::mat4 m = Matrix_Camera_View(camera->position, camera->view_vector, glm::vec4(0, 1, 0, 0));
-
-    modelMatrix = glm::inverse(m) *
-                  Matrix_Translate(0, -0.5, -4) *
+    modelMatrix = Matrix_Translate(0, -0.5, -4) *
                   Matrix_Rotate_X(M_PI_2) *
                   Matrix_Scale(SCALE_FACTOR_X, 1.0f, SCALE_FACTOR_Z);
 
