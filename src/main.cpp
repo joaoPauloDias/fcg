@@ -136,12 +136,12 @@ int main(int argc, char *argv[])
     activeScene = MENU_SCENE;
 
 
-    Sound* ambiance = AudioManager::makeSound("../../assets/audio/dungeon.mp3", false, 0.15);
+    Sound* ambiance = SoundPlayer::initSound("../../assets/audio/dungeon.mp3", false, 0.15);
 
     engine::Run(window, [&](){
 
-        if (!AudioManager::isSoundPlaying(ambiance))
-            AudioManager::playSound(ambiance);
+        if (!SoundPlayer::isPlaying(ambiance))
+            SoundPlayer::playSound(ambiance);
         
         switch (activeScene) {
         case MENU_SCENE:

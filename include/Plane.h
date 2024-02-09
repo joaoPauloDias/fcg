@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AudioManager.h"
+#include "SoundPlayer.h"
 #include "GameObject.h"
 #include "glm/vec4.hpp"
 #include "ObjModel.h"

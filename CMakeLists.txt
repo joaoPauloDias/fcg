@@ -27,7 +27,7 @@ set(SOURCES
   src/GameScene.cpp
   src/MenuScene.cpp
   src/Plane.cpp
-  src/AudioManager.cpp
+  src/SoundPlayer.cpp
 )
 
 cmake_minimum_required(VERSION 3.5.0)

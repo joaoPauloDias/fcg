@@ -5,7 +5,7 @@
 #include "TextureLoader.h"
 #include "Camera.h"
 #include "collisions.h"
-#include "AudioManager.h"
+#include "SoundPlayer.h"
 #include <functional>
 
 #define ATTACK_AVAILABLE 0
