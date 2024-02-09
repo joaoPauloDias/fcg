@@ -35,6 +35,8 @@ bool g_LeftMouseButtonPressed = false;
 bool g_RightMouseButtonPressed = false;  // Análogo para botão direito do mouse
 bool g_MiddleMouseButtonPressed = false; // Análogo para botão do meio do mouse
 
+bool g_FullScreen = false;
+
 
 namespace engine
 {
@@ -66,6 +68,7 @@ namespace engine
         // Criamos uma janela do sistema operacional, com 800 colunas e 600 linhas
         // de pixels, e com título "INF01047 ...".
         GLFWwindow *window = glfwCreateWindow(800, 600, "Maze of The Beast", NULL, NULL);
+
         if (!window)
         {
             glfwTerminate();
@@ -239,6 +242,17 @@ namespace engine
             LoadShadersFromFiles();
             fprintf(stdout, "Shaders recarregados!\n");
             fflush(stdout);
+        }
+
+        if (key == GLFW_KEY_F1 && action == GLFW_PRESS) {
+            if (g_FullScreen) {
+                glfwSetWindowMonitor(window, NULL, 0, 0, 800, 600, GLFW_REFRESH_RATE);
+                g_FullScreen = false;
+            } else {
+                glfwSetWindowMonitor(window, glfwGetPrimaryMonitor(), 0, 0, 800, 600, 0);
+                g_FullScreen = true;
+            }
+            
         }
     }
 
