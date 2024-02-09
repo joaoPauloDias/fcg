@@ -10,6 +10,8 @@
 #define strcasecmp strcmp // Hack to make miniaudio compile on windows
 #include <miniaudio/miniaudio.h>
 
+// FONTE: https://github.com/mackron/miniaudio
+
 static ma_engine engine;
 
 struct Sound {

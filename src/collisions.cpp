@@ -4,6 +4,8 @@
 #include <algorithm>
 
 namespace collisions{
+    // FONTE: https://www.realtimerendering.com/intersections.html
+    // FONTE: https://realtimecollisiondetection.net/books/rtcd/
     bool checkCollision(
         const Sphere& sphere, 
         const glm::vec3& bbox_min, const glm::vec3& bbox_max, const glm::mat4& modelMatrix
@@ -37,6 +39,8 @@ namespace collisions{
         return pow(a.x - b.x, 2) + pow(a.y - b.y, 2) + pow(a.z - b.z, 2);
     }
 
+    // FONTE: https://www.realtimerendering.com/intersections.html
+    // FONTE: https://realtimecollisiondetection.net/books/rtcd/
     bool checkCollision(const Cylinder& cylinder, const Sphere& sphere) {
 
         float minCylinderHeight = cylinder.center.y - cylinder.height/2;
