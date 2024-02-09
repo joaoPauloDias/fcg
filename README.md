@@ -6,6 +6,8 @@ Assuma o papel de Teseu e entre no labirinto de Dédalo para matar a terrível b
 
 Este trabalho foi desenvolvido para a cadeira de Fundamentos de Computação Gráfica - 2023/2.
 
+[Vídeo no YouTube](https://youtu.be/_OU3etGP900)
+
 
 ## Tecnologias e Bibliotecas Utilizadas
 - OpenGL
